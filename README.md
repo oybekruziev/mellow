@@ -46,6 +46,12 @@ zsh scripts/publish.sh
 
 U DMG ichidagi ilova notarizatsiyalanganini tekshiradi va uni Cloudflare R2'dagi `mellow-downloads` bucket'iga `Mellow.dmg` nomi bilan yuklaydi (brauzerda `Mellow-<version>.dmg` bo'lib saqlanadi), yoniga `latest.json` yozadi. Saytdagi Download tugmalari doim shu `Mellow.dmg` ga olib boradi, versiya yozuvi `latest.json` dan olinadi. Versiya raqami `MARKETING_VERSION` dan olinadi — har yangi chiqishdan oldin uni oshiring. Wrangler Cloudflare akkauntiga login qilingan bo'lishi kerak (`npx wrangler login`).
 
+Sayt (`website/`) `bemellow.cc` da Cloudflare Worker sifatida turadi. O'zgarishdan keyin:
+
+```sh
+cd website && npx wrangler deploy
+```
+
 ## Qisqa tugmalar
 
 Panel yoki app faol bo‘lganda: Space — boshlash/pauza/davom, Return — asosiy amal, Esc — tasdiqni bekor qilish yoki Settings’ni yopish; ⌘M — ixcham rejim, ⌘W — yashirish, ⌘, — Settings, ⌘. — tugatish, ⌘L — vazifa maydoni, ⌘Q — chiqish. Ready holatida 1/2/3 — vaqt presetlari.

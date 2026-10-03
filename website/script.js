@@ -26,7 +26,7 @@ setInterval(() => {
 
 // Show the published version next to the Download buttons (scripts/publish.sh writes latest.json).
 // The buttons link straight to Mellow.dmg, so they work without this.
-fetch('https://pub-b692e0bf9c0b436f87e42a33288b264b.r2.dev/latest.json', { cache: 'no-cache' })
+fetch('https://download.bemellow.cc/latest.json', { cache: 'no-cache' })
   .then((res) => (res.ok ? res.json() : Promise.reject(res.status)))
   .then(({ version }) => {
     if (!version) return;

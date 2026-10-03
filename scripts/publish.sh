@@ -7,7 +7,7 @@
 set -eu
 cd "${0:A:h:h}"
 bucket=${R2_BUCKET:-mellow-downloads}
-base=${R2_PUBLIC_URL:-https://pub-b692e0bf9c0b436f87e42a33288b264b.r2.dev}
+base=${R2_PUBLIC_URL:-https://download.bemellow.cc}
 dmg=${1:-}
 if [[ -z $dmg ]]; then
     version=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" Build/Mellow.app/Contents/Info.plist)
