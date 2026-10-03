@@ -38,13 +38,15 @@ zsh scripts/release.sh
 
 U Developer ID (Oybek Ruziev, 79CTV95T7T) bilan imzolaydi, Xcode'dagi Apple akkaunti orqali Apple'ga notarizatsiyaga yuboradi, tasdiqni ilovaga biriktiradi (staple) va `Build/Mellow-<version>.dmg` ni yaratadi. Notarizatsiyasiz mahalliy DMG: `zsh scripts/make_dmg.sh`.
 
-Yangi versiyani saytga chiqarish (sayt doim eng so'nggisini beradi):
+Yangi versiyani chiqarish: `MARKETING_VERSION` ni oshiring, `zsh scripts/release.sh` bilan notarizatsiyalangan DMG yasang, keyin GitHub'da shu DMG biriktirilgan release chiqaring:
 
 ```sh
-zsh scripts/publish.sh
+gh release create v1.1 Build/Mellow-1.1.dmg --title "Mellow 1.1" --generate-notes
 ```
 
-U DMG ichidagi ilova notarizatsiyalanganini tekshiradi va uni Cloudflare R2'dagi `mellow-downloads` bucket'iga `Mellow.dmg` nomi bilan yuklaydi (brauzerda `Mellow-<version>.dmg` bo'lib saqlanadi), yoniga `latest.json` yozadi. Saytdagi Download tugmalari doim shu `Mellow.dmg` ga olib boradi, versiya yozuvi `latest.json` dan olinadi. Versiya raqami `MARKETING_VERSION` dan olinadi — har yangi chiqishdan oldin uni oshiring. Wrangler Cloudflare akkauntiga login qilingan bo'lishi kerak (`npx wrangler login`).
+Release chiqishi bilan `.github/workflows/publish-dmg.yml` DMG'ni oladi, ilova notarizatsiyalanganini tekshiradi va uni Cloudflare R2'ga (`download.bemellow.cc/Mellow.dmg`) yuklaydi — saytdagi Download tugmasi va versiya yozuvi o'zi yangilanadi. Brauzerda fayl `Mellow-<version>.dmg` nomi bilan saqlanadi. Pre-release'lar saytga chiqmaydi. Repo'da `CLOUDFLARE_API_TOKEN` secret'i (Workers R2 Storage: Edit) bo'lishi kerak.
+
+Qo'lda (GitHub'siz) chiqarish ham mumkin: `zsh scripts/publish.sh` — bu uchun wrangler Cloudflare'ga login qilingan bo'lishi kerak (`npx wrangler login`).
 
 Sayt (`website/`) `bemellow.cc` da Cloudflare Worker sifatida turadi. O'zgarishdan keyin:
 
