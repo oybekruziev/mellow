@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mellow — A little space to focus</title>
+  <meta name="description" content="Mellow sits at the edge of your screen with one task and a timer. Stay with it, and something small grows. A native focus timer for macOS 26.">
+  <meta name="theme-color" content="#fbfaf7">
+  <meta property="og:title" content="Mellow — A little space to focus">
+  <meta property="og:description" content="One task. One timer. One flower. A native focus timer for macOS 26.">
+  <meta property="og:image" content="assets/logo.png">
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <link rel="apple-touch-icon" href="assets/logo.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="nav" id="top">
+  <div class="container">
+    <a class="brand" href="#top" aria-label="Mellow home">
+      <img src="assets/logo.png" alt="">
+      <span>Mellow</span>
+    </a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="#how">How it works</a>
+      <a href="#companions">Companions</a>
+      <a href="#details">Details</a>
+      <a class="btn btn-dark" href="https://github.com/oybekruziev/mellow/releases/latest">Download</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <h1>A little space to focus.</h1>
+      <p class="hero-sub">Mellow sits at the edge of your screen with one task and a timer. Stay with it, and something small grows.</p>
+      <div class="hero-ctas">
+        <a class="btn btn-lg btn-green" href="https://github.com/oybekruziev/mellow/releases/latest">Download for Mac</a>
+        <a class="link-more" href="#how">See how it works <img src="assets/chevron-down.svg" alt=""></a>
+      </div>
+      <p class="requirement">For macOS 26 Tahoe and later</p>
+
+      <div class="hero-mockup" id="hero-mockup" role="img" aria-label="Mellow's floating panel on a Mac desktop, focusing on “Finish the article” with 24:38 left.">
+        <div class="desktop" aria-hidden="true">
+          <img class="wallpaper" src="assets/wallpaper-light.jpg" alt="">
+          <div class="writer">
+            <div class="lights"><img src="assets/dot-red.svg" alt=""><img src="assets/dot-yellow.svg" alt=""><img src="assets/dot-green.svg" alt=""></div>
+            <span class="doc-title">article-draft</span>
+            <h3>Why small breaks make better work</h3>
+            <i class="line" style="top:150px;width:520px"></i>
+            <i class="line" style="top:172px;width:640px"></i>
+            <i class="line" style="top:194px;width:600px"></i>
+            <i class="line" style="top:216px;width:660px"></i>
+            <i class="line" style="top:238px;width:480px"></i>
+            <i class="line" style="top:278px;width:610px"></i>
+            <i class="line" style="top:300px;width:650px"></i>
+            <i class="line" style="top:322px;width:560px"></i>
+            <i class="line" style="top:344px;width:630px"></i>
+            <i class="line" style="top:366px;width:420px"></i>
+            <i class="line" style="top:406px;width:600px"></i>
+            <i class="line" style="top:428px;width:540px"></i>
+          </div>
+          <div class="menubar">
+            <img class="apple" src="assets/system-menu.svg" alt="">
+            <b>Writer</b><span>File</span><span>Edit</span><span>Format</span><span>View</span><span>Window</span><span>Help</span>
+            <span class="spacer"></span>
+            <span class="extra"><img src="assets/menubar-icon.svg" alt=""><span data-live-time>24:38</span></span>
+            <span class="clock">Tue 30 Sep  9:41</span>
+          </div>
+          <div class="panel" style="left:1121px;top:43px">
+            <div class="p-head">
+              <div class="p-avatar"><img src="assets/companion-sprout.png" alt=""></div>
+              <div class="p-task">
+                <span class="p-title">Finish the article</span>
+                <span class="p-status"><img class="dot" src="assets/state-dot.svg" alt="">Focusing · 25 min</span>
+              </div>
+              <div class="p-tools"><span><img src="assets/icon-settings.svg" alt=""></span><span><img src="assets/icon-compact.svg" alt=""></span><span><img src="assets/icon-hide.svg" alt=""></span></div>
+            </div>
+            <div class="p-timer">
+              <span class="p-time" data-live-time>24:38</span>
+              <span class="grow"></span>
+              <span class="p-end glass-btn"><img src="assets/icon-stop.svg" alt=""></span>
+              <span class="p-pause tinted"><img src="assets/icon-pause.svg" alt=""></span>
+            </div>
+            <div class="p-progress"><i></i></div>
+            <div class="p-today">
+              <span class="p-flowers"><img src="assets/flower.png" alt=""><img src="assets/flower.png" alt=""><img src="assets/flower.png" alt=""></span>
+              <span>3 sessions today</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section class="how" id="how">
+    <div class="container">
+      <h2 class="section-title">One task. One timer. One flower.</h2>
+      <p class="section-lead">Nothing to set up, nothing to manage. Mellow does one small thing and stays out of your way.</p>
+
+      <div class="band" aria-hidden="true">
+        <img class="wallpaper" src="assets/wallpaper-light.jpg" alt="">
+
+        <div class="panel ready">
+          <div class="p-head">
+            <div class="p-avatar logo"><img src="assets/logo.png" alt=""></div>
+            <div class="p-task">
+              <span class="p-title">Mellow</span>
+              <span class="p-status">Ready to focus</span>
+            </div>
+            <div class="p-tools"><span><img src="assets/icon-settings.svg" alt=""></span><span><img src="assets/icon-compact.svg" alt=""></span><span><img src="assets/icon-hide.svg" alt=""></span></div>
+          </div>
+          <div class="p-field">What are you working on?</div>
+          <div class="p-timer">
+            <span class="p-time">25:00</span>
+            <span class="grow"></span>
+            <span class="p-start tinted"><img src="assets/icon-play.svg" alt="">Start Focus</span>
+          </div>
+          <div class="p-segments"><span>15 min</span><span class="on">25 min</span><span>45 min</span></div>
+          <div class="p-today">
+            <span class="p-flowers"><img src="assets/flower.png" alt=""><img src="assets/flower.png" alt=""><img src="assets/flower.png" alt=""></span>
+            <span>3 sessions today</span>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="p-head">
+            <div class="p-avatar"><img src="assets/companion-sprout.png" alt=""></div>
+            <div class="p-task">
+              <span class="p-title">Finish the article</span>
+              <span class="p-status"><img class="dot" src="assets/state-dot.svg" alt="">Focusing · 25 min</span>
+            </div>
+            <div class="p-tools"><span><img src="assets/icon-settings.svg" alt=""></span><span><img src="assets/icon-compact.svg" alt=""></span><span><img src="assets/icon-hide.svg" alt=""></span></div>
+          </div>
+          <div class="p-timer">
+            <span class="p-time">24:38</span>
+            <span class="grow"></span>
+            <span class="p-end glass-btn"><img src="assets/icon-stop.svg" alt=""></span>
+            <span class="p-pause tinted"><img src="assets/icon-pause.svg" alt=""></span>
+          </div>
+          <div class="p-progress"><i></i></div>
+          <div class="p-today">
+            <span class="p-flowers"><img src="assets/flower.png" alt=""><img src="assets/flower.png" alt=""><img src="assets/flower.png" alt=""></span>
+            <span>3 sessions today</span>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="p-head">
+            <div class="p-avatar"><img src="assets/companion-bloom.png" alt=""></div>
+            <div class="p-task">
+              <span class="p-title">Session complete</span>
+              <span class="p-status"><img class="check" src="assets/icon-check-sm.svg" alt="">Finish the article</span>
+            </div>
+            <div class="p-tools"><span><img src="assets/icon-settings.svg" alt=""></span><span><img src="assets/icon-compact.svg" alt=""></span><span><img src="assets/icon-hide.svg" alt=""></span></div>
+          </div>
+          <div class="p-msg">
+            <strong>You grew a flower.</strong>
+            <span>Nice work. Rest your eyes before the next one.</span>
+          </div>
+          <div class="p-actions">
+            <span class="glass-btn">Later</span>
+            <span class="tinted break"><img src="assets/icon-cup.svg" alt="">5-min Break</span>
+          </div>
+          <div class="p-today">
+            <span class="p-flowers"><img src="assets/flower.png" alt=""><img src="assets/flower.png" alt=""><img src="assets/flower.png" alt=""><img class="new" src="assets/flower.png" alt=""></span>
+            <span class="strong">4 sessions today</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="captions">
+        <div>
+          <h3>Name the one thing</h3>
+          <p>Type what you’re working on, pick 15, 25 or 45 minutes, and start.</p>
+        </div>
+        <div>
+          <h3>Work. It grows.</h3>
+          <p>Mellow floats above your apps, small and quiet. Your companion grows a little with every quarter of the session.</p>
+        </div>
+        <div>
+          <h3>Keep the flower</h3>
+          <p>Finish the session and a flower joins today’s count. Take a five-minute break if you like — it never starts on its own.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Companions -->
+  <section class="companions" id="companions">
+    <div class="container">
+      <h2 class="section-title">Pick who keeps you company.</h2>
+      <p class="section-lead">Seven small companions. Each one settles in while you focus and wakes up when you’re done.</p>
+      <ul class="companions-row">
+        <li><img src="assets/c-plant.png" alt=""><h3>Plant</h3><p>Grows, then blooms</p></li>
+        <li><img src="assets/c-cat.png" alt=""><h3>Cat</h3><p>Naps, then wakes up</p></li>
+        <li><img src="assets/c-candle.png" alt=""><h3>Candle</h3><p>Glows, then rests</p></li>
+        <li><img src="assets/c-fox.png" alt=""><h3>Fox</h3><p>Dozes, then perks up</p></li>
+        <li><img src="assets/c-coffee.png" alt=""><h3>Coffee</h3><p>Steams, then cools</p></li>
+        <li><img src="assets/c-moon.png" alt=""><h3>Moon</h3><p>Drifts on a cloud</p></li>
+        <li><img src="assets/c-cactus.png" alt=""><h3>Cactus</h3><p>Grows a pink bloom</p></li>
+      </ul>
+      <p class="hint"><img src="assets/icon-settings-hint.svg" alt="">Switch anytime in Settings or by right-clicking your companion. Your session keeps going.</p>
+    </div>
+  </section>
+
+  <!-- Never punish -->
+  <section class="punish">
+    <div class="container">
+      <div class="punish-text">
+        <h2>Leave whenever you need to.</h2>
+        <p>Ending early asks once, then lets you go. Your companion is fine, and the flower waits for the next session.</p>
+        <ul class="promises">
+          <li><span class="check"><img src="assets/icon-check.svg" alt=""></span>Nothing wilts, nothing dies</li>
+          <li><span class="check"><img src="assets/icon-check.svg" alt=""></span>No streaks to lose</li>
+          <li><span class="check"><img src="assets/icon-check.svg" alt=""></span>No alarms, just a soft chime at the end</li>
+        </ul>
+      </div>
+      <div class="visual" aria-hidden="true">
+        <img class="wallpaper" src="assets/wallpaper-light.jpg" alt="">
+        <div class="panel">
+          <div class="p-head">
+            <div class="p-avatar"><img src="assets/companion-sprout.png" alt=""></div>
+            <div class="p-task">
+              <span class="p-title">Finish the article</span>
+              <span class="p-status"><img class="dot" src="assets/state-dot.svg" alt="">Focusing · 25 min</span>
+            </div>
+            <div class="p-tools"><span><img src="assets/icon-settings.svg" alt=""></span><span><img src="assets/icon-compact.svg" alt=""></span><span><img src="assets/icon-hide.svg" alt=""></span></div>
+          </div>
+          <div class="p-timer"><span class="p-time muted">24:38</span></div>
+          <div class="p-msg confirm">
+            <strong>End this session?</strong>
+            <span>It won’t grow a flower. Today’s flowers stay.</span>
+          </div>
+          <div class="p-actions">
+            <span class="tinted">Keep Going</span>
+            <span class="glass-btn">End Session</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Details -->
+  <section class="details" id="details">
+    <div class="container">
+      <h2 class="section-title">At home on macOS 26.</h2>
+      <p class="section-lead">Liquid Glass, the menu bar, Dark Mode and the keyboard. Mellow behaves like it came with your Mac.</p>
+
+      <div class="grid">
+        <article class="tile tall">
+          <h3>Lives in your menu bar.</h3>
+          <p>The time left sits next to the clock. Pause, hide the panel or end the session right from the menu.</p>
+          <div class="crop" aria-hidden="true">
+            <div class="desktop z13">
+              <img class="wallpaper" src="assets/wallpaper-light.jpg" alt="">
+              <div class="menubar">
+                <img class="apple" src="assets/system-menu.svg" alt="">
+                <b>Writer</b><span>File</span><span>Edit</span><span>Format</span><span>View</span><span>Window</span><span>Help</span>
+                <span class="spacer"></span>
+                <span class="extra is-open"><img src="assets/menubar-icon.svg" alt="">24:38</span>
+                <span class="clock">Tue 30 Sep  9:41</span>
+              </div>
+              <div class="panel" style="left:1122px;top:44px">
+                <div class="p-head">
+                  <div class="p-avatar"><img src="assets/companion-sprout.png" alt=""></div>
+                  <div class="p-task">
+                    <span class="p-title">Finish the article</span>
+                    <span class="p-status"><img class="dot" src="assets/state-dot.svg" alt="">Focusing · 25 min</span>
+                  </div>
+                  <div class="p-tools"><span><img src="assets/icon-settings.svg" alt=""></span><span><img src="assets/icon-compact.svg" alt=""></span><span><img src="assets/icon-hide.svg" alt=""></span></div>
+                </div>
+                <div class="p-timer">
+                  <span class="p-time">24:38</span>
+                  <span class="grow"></span>
+                  <span class="p-end glass-btn"><img src="assets/icon-stop.svg" alt=""></span>
+                  <span class="p-pause tinted"><img src="assets/icon-pause.svg" alt=""></span>
+                </div>
+                <div class="p-progress"><i></i></div>
+                <div class="p-today">
+                  <span class="p-flowers"><img src="assets/flower.png" alt=""><img src="assets/flower.png" alt=""><img src="assets/flower.png" alt=""></span>
+                  <span>3 sessions today</span>
+                </div>
+              </div>
+              <div class="menu" style="left:1192px;top:32px">
+                <div class="m-head">Focusing — 24:38 left</div>
+                <div class="m-sub">Finish the article</div>
+                <hr>
+                <div class="m-sel">Hide Panel</div>
+                <div>Pause</div>
+                <div>End Session</div>
+                <hr>
+                <div>Settings… <kbd>⌘,</kbd></div>
+                <hr>
+                <div>Quit Mellow <kbd>⌘Q</kbd></div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <div class="col">
+          <article class="tile">
+            <h3>Shrinks when you need room.</h3>
+            <p>Press ⌘M for a tiny capsule with just the time.</p>
+            <div class="crop" aria-hidden="true">
+              <div class="desktop z13">
+                <img class="wallpaper" src="assets/wallpaper-light.jpg" alt="">
+                <div class="menubar">
+                  <img class="apple" src="assets/system-menu.svg" alt="">
+                  <b>Writer</b><span>File</span><span>Edit</span><span>Format</span><span>View</span><span>Window</span><span>Help</span>
+                  <span class="spacer"></span>
+                  <span class="extra"><img src="assets/menubar-icon.svg" alt="">24:38</span>
+                  <span class="clock">Tue 30 Sep  9:41</span>
+                </div>
+                <div class="compact" style="left:1254px;top:44px">
+                  <div class="p-avatar"><img src="assets/companion-sprout.png" alt=""></div>
+                  <div class="c-time"><b>24:38</b><span>Focus</span></div>
+                  <span class="p-pause tinted"><img src="assets/icon-pause.svg" alt=""></span>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="tile dark">
+            <h3>Light or Dark, always glass.</h3>
+            <p>Follows your Mac’s appearance, glass and all.</p>
+            <div class="crop" aria-hidden="true">
+              <div class="desktop dark">
+                <img class="wallpaper" src="assets/wallpaper-dark.jpg" alt="">
+                <div class="menubar">
+                  <img class="apple" src="assets/system-menu-dark.svg" alt="">
+                  <b>Writer</b><span>File</span><span>Edit</span><span>Format</span><span>View</span><span>Window</span><span>Help</span>
+                  <span class="spacer"></span>
+                  <span class="extra"><img src="assets/menubar-icon-dark.svg" alt="">24:38</span>
+                  <span class="clock">Tue 30 Sep  9:41</span>
+                </div>
+                <div class="panel dark" style="left:1122px;top:44px">
+                  <div class="p-head">
+                    <div class="p-avatar"><img src="assets/companion-sprout.png" alt=""><img src="assets/dark-companion-overlay.png" alt=""></div>
+                    <div class="p-task">
+                      <span class="p-title">Finish the article</span>
+                      <span class="p-status"><img class="dot" src="assets/state-dot-dark.svg" alt="">Focusing · 25 min</span>
+                    </div>
+                    <div class="p-tools"><span><img src="assets/icon-settings-dark.svg" alt=""></span><span><img src="assets/icon-compact-dark.svg" alt=""></span><span><img src="assets/icon-hide-dark.svg" alt=""></span></div>
+                  </div>
+                  <div class="p-timer">
+                    <span class="p-time">24:38</span>
+                    <span class="grow"></span>
+                    <span class="p-end"><img src="assets/icon-stop-dark.svg" alt=""></span>
+                    <span class="p-pause tinted"><img src="assets/icon-pause-dark.svg" alt=""></span>
+                  </div>
+                  <div class="p-progress"><i></i></div>
+                  <div class="p-today">
+                    <span class="p-flowers"><img src="assets/flower-dark.png" alt=""><img src="assets/flower-dark.png" alt=""><img src="assets/flower-dark.png" alt=""></span>
+                    <span>3 sessions today</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <div class="facts">
+        <div><h3>Keyboard first</h3><p>Space starts and pauses. ⌘. ends the session. ⌘, opens Settings.</p></div>
+        <div><h3>Private by design</h3><p>No account and no sign-in. Your tasks and flowers stay on your Mac.</p></div>
+        <div><h3>Accessible</h3><p>VoiceOver labels, visible focus rings, Reduce Motion and Reduce Transparency.</p></div>
+        <div><h3>Stays in place</h3><p>Floats above your apps on every Space. Turn off Stay on Top if you prefer.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Final CTA -->
+  <section class="final">
+    <div class="container">
+      <div class="cta-band">
+        <img class="wallpaper" src="assets/wallpaper-dark.jpg" alt="">
+        <div class="app-icon"><img src="assets/logo.png" alt="Mellow app icon"></div>
+        <h2>Start your first session.</h2>
+        <p>Twenty-five minutes, one task, one small flower.</p>
+        <a class="btn btn-lg btn-bright" href="https://github.com/oybekruziev/mellow/releases/latest">Download for Mac</a>
+        <p class="requirement">For macOS 26 Tahoe and later</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="brand">
+      <img src="assets/logo.png" alt="">
+      <span>Mellow</span>
+      <small>A little space to focus.</small>
+    </div>
+    <nav aria-label="Footer">
+      <a href="https://github.com/oybekruziev/mellow/issues">Support</a>
+      <a href="#details">Privacy</a>
+      <a href="https://github.com/oybekruziev/mellow">Press kit</a>
+      <span>© 2026 Mellow</span>
+    </nav>
+  </div>
+</footer>
+
+<script src="script.js" defer></script>
+</body>
+</html>
