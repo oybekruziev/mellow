@@ -10,7 +10,7 @@ struct PlanList: View {
                 VStack(spacing: 0) {
                     ForEach(Array(settings.plan.enumerated()), id: \.element.id) { offset, item in
                         if offset > 0 { Palette.separator.frame(height: 0.5).padding(.leading, 30) }
-                        PlanRow(item: item, number: offset + 1, settings: settings)
+                        PlanRow(item: item, number: offset + 1, settings: settings, onEdit: onEdit)
                     }
                 }
             }
@@ -47,6 +47,7 @@ private struct PlanRow: View {
     let item: PlanItem
     let number: Int
     @Bindable var settings: Settings
+    var onEdit: () -> Void = {}
     @State private var hover = false
     var body: some View {
         HStack(spacing: 8) {
@@ -65,7 +66,9 @@ private struct PlanRow: View {
                 .strikethrough(item.done, color: Palette.secondary)
                 .foregroundStyle(item.done ? Palette.secondary : Palette.primary)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .help(item.title)
+                .contentShape(Rectangle())
+                .onTapGesture(perform: onEdit)
+                .help("\(item.title) — click to edit the plan")
             if hover && !item.done {
                 stepButton(.minus, delta: -5)
             }

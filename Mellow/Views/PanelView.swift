@@ -35,7 +35,7 @@ struct PanelRootView: View {
         .onChange(of: model.engine.phase) {
             model.syncMusic()
             // The editor only plans ahead; a session started from the menu bar closes it.
-            if model.engine.phase != .ready { model.closePlanEditor() }
+            if !model.canEditPlan { model.closePlanEditor() }
         }
         .onChange(of: model.settings.musicDuringFocus) { if model.engine.phase.isActive { model.syncMusic() } }
         .onChange(of: model.settings.musicVolume) { _, volume in model.music.volume = volume }
@@ -247,6 +247,8 @@ struct PanelView: View {
             if !model.settings.plan.isEmpty {
                 PlanList(settings: model.settings) { model.openPlanEditor() }
                     .transition(.opacity.combined(with: .move(edge: .top)))
+            } else {
+                planLink
             }
             HStack(spacing: 10) {
                 timerText
@@ -345,8 +347,27 @@ struct PanelView: View {
                 PushButton(title: nextTask == nil ? "New Session" : "Next Task", icon: .play, tint: Palette.focus) { model.act(.newSession) }
                 Spacer(minLength: 0)
             }
+            planLink
             todayRow()
         }
+    }
+
+    /// The way into the plan editor: "Plan several tasks", or "Edit plan" once there is one.
+    private var planLink: some View {
+        let editing = !model.settings.pendingPlan.isEmpty
+        return Button { model.openPlanEditor() } label: {
+            HStack(spacing: 6) {
+                IconImage(.list, size: 13)
+                Text(editing ? "Edit plan · \(model.settings.pendingPlan.count) left" : "Plan several tasks…")
+                    .font(.system(size: 12, weight: .medium))
+            }
+            .foregroundStyle(Palette.focus)
+            .padding(.horizontal, 4).frame(height: 18)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(PressableStyle())
+        .help("Plan several tasks — a name and time for each, breaks in between (⌘P)")
+        .transition(.opacity)
     }
 
     private var timerText: some View { timerText(color: paused ? Palette.secondary : Palette.primary) }

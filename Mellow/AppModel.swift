@@ -98,8 +98,10 @@ final class AppModel: NSObject {
         showPanel()
         withAnimation(morph) { compact = false; planEditing = false; onboarding = true }
     }
+    /// The plan can be edited whenever no timer is counting down.
+    var canEditPlan: Bool { engine.phase == .ready || engine.phase == .breakOver }
     func openPlanEditor() {
-        guard engine.phase == .ready, !onboarding else { return }
+        guard canEditPlan, !onboarding else { return }
         settingsOpen = false
         showPanel()
         withAnimation(morph) { compact = false; planEditing = true }
@@ -201,6 +203,9 @@ final class AppModel: NSObject {
             case "w": hidePanel()
             case ".": endAction()
             case "q": NSApp.terminate(nil)
+            case "p":
+                guard canEditPlan, !onboarding else { return event }
+                openPlanEditor()
             case "l":
                 guard engine.phase == .ready else { return event }
                 pendingTaskFocus = compact || planEditing

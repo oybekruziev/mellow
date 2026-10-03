@@ -38,6 +38,9 @@ struct MenuBarMenu: View {
             visibilityButton
         }
         Divider()
+        Button(model.settings.pendingPlan.isEmpty ? "Plan Tasks…" : "Edit Plan…") { model.openPlanEditor() }
+            .keyboardShortcut("p")
+            .disabled(!model.canEditPlan)
         Button("Settings…") { model.openSettings() }.keyboardShortcut(",")
         Divider()
         Button("Quit Mellow") { NSApp.terminate(nil) }.keyboardShortcut("q")
