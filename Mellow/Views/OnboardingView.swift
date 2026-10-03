@@ -83,7 +83,7 @@ struct OnboardingView: View {
     }
 
     private var presets: some View {
-        SegmentedPicker(options: [15, 25, 45, 60].map { ($0, "\($0) min") },
+        SegmentedPicker(options: AppModel.focusPresets.map { ($0, "\($0) min") },
                         selection: $model.settings.focusMinutes, label: "Focus length")
     }
 
@@ -114,7 +114,7 @@ struct OnboardingView: View {
             if step < steps - 1 {
                 PushButton(title: step == 0 ? "Get Started" : "Next", tint: Palette.focus) { go(to: step + 1) }
             } else {
-                PushButton(title: "Start", icon: .play, tint: Palette.focus) { model.finishOnboarding() }
+                PushButton(title: "Done", icon: .check, tint: Palette.focus) { model.finishOnboarding() }
             }
         }
         .animation(.snappy(duration: 0.25), value: step)

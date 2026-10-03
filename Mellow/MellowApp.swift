@@ -35,6 +35,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         alert.informativeText = "This session will end without a flower."
         alert.addButton(withTitle: "Cancel")
         alert.addButton(withTitle: "Quit")
+        NSApp.activate() // an accessory app's alert would otherwise open without keyboard focus
         return alert.runModal() == .alertSecondButtonReturn ? .terminateNow : .terminateCancel
     }
 }

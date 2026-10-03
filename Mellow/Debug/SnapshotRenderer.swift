@@ -16,6 +16,7 @@ enum SnapshotRenderer {
             ("4-confirm", [.startFocus, .requestEnd], 322), ("5-complete", [.startFocus], 1501),
             ("6-break", [.startFocus], 1501), ("7-breakover", [.startFocus], 1501),
             ("10-plan", [], 0), ("11-plan-break", [.startFocus], 1501),
+            ("14-edge-long", [.startFocus], 5),
         ]
         for (name, events, advance) in scenarios {
             var clock = Date(timeIntervalSinceReferenceDate: 800_000_000)
@@ -32,6 +33,11 @@ enum SnapshotRenderer {
                 settings.addPlanItem("Write the intro", minutes: 25)
                 settings.addPlanItem("Reply to design feedback", minutes: 15)
                 settings.addPlanItem("Review pull request", minutes: 45)
+            }
+            if name == "14-edge-long" {
+                settings.focusMinutes = 120
+                settings.lastTask = "Write the quarterly investor update and reply to every single comment in the doc"
+                for _ in 0..<9 { stats.earnFlower(at: clock) }
             }
             let engine = SessionEngine(settings: settings, stats: stats, now: { clock })
             events.forEach { engine.send($0) }

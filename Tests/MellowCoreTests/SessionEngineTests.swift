@@ -169,4 +169,23 @@ struct SessionEngineTests {
         #expect(f.engine.phase == .ready)
         #expect(f.settings.pendingPlan.count == 1 && f.stats.count == 0)
     }
+
+    @Test func newSessionAfterAFinishedPlanUsesTheTaskField() {
+        let f = Fixture()
+        f.settings.addPlanItem("Only task", minutes: 10)
+        f.settings.lastTask = "Inbox"
+        f.engine.send(.startFocus); f.advance(600)
+        #expect(f.engine.phase == .complete)
+        f.engine.send(.startBreak); f.engine.send(.endBreak)
+        #expect(f.engine.send(.newSession))
+        #expect(f.engine.task == "Inbox" && f.settings.plan.isEmpty)
+    }
+
+    @Test func sessionThatEndedBeforeMidnightDoesNotCountForTheNextDay() {
+        let f = Fixture()
+        f.engine.send(.startFocus)
+        f.advance(36 * 3600) // the Mac slept through the end and into another day
+        #expect(f.engine.phase == .complete)
+        #expect(f.stats.count == 0)
+    }
 }

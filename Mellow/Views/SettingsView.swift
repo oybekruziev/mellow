@@ -27,7 +27,7 @@ struct SettingsView: View {
             AppearanceSection(settings: model.settings)
             Text("New lengths apply from your next session.")
                 .font(.system(size: 12)).foregroundStyle(Palette.secondary)
-            MadeBySection { model.settingsOpen = false; model.replayOnboarding() }
+            MadeBySection(replayDisabled: model.engine.phase.isActive) { model.settingsOpen = false; model.replayOnboarding() }
         }
         .font(.system(size: 13)).foregroundStyle(Palette.primary)
         .padding(.horizontal, 14).padding(.top, 12).padding(.bottom, 16)
@@ -131,6 +131,7 @@ struct MusicSection: View {
                     }
                     .buttonStyle(ToolbarStyle())
                     .help(model.music.isPlaying ? "Stop Preview" : "Preview Music")
+                    .accessibilityLabel(model.music.isPlaying ? "Stop Preview" : "Preview Music")
                 } else {
                     IconImage(.music, size: 12).foregroundStyle(Palette.secondary)
                 }

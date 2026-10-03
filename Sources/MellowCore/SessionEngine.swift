@@ -47,10 +47,12 @@ final class SessionEngine {
         if left == 0 || ceil(left) != ceil(remaining) { remaining = left }
         guard left == 0 else { return }
         let wasBreak = phase.isBreak
+        let endedAt = endDate
         self.endDate = nil
         phase = wasBreak ? .breakOver : .complete
         if !wasBreak {
-            stats.earnFlower(at: date)
+            // A session that ended while the Mac slept counts for the day it ended on.
+            stats.earnFlower(at: date, endedAt: endedAt)
             completedAt = date
             if let index = settings.plan.firstIndex(where: { $0.id == planItemID }) {
                 settings.plan[index].done = true
@@ -65,12 +67,7 @@ final class SessionEngine {
         refresh()
         switch (phase, event) {
         case (.ready, .startFocus):
-            if !startNextPlanItem() {
-                let trimmed = settings.lastTask.trimmingCharacters(in: .whitespacesAndNewlines)
-                task = trimmed.isEmpty ? "Focus time" : trimmed
-                planItemID = nil
-                begin(minutes: settings.focusMinutes, isBreak: false)
-            }
+            if !startNextPlanItem() { startFreeFocus() }
         case (.focusing(true), .pause): freeze(); phase = .focusing(running: false)
         case (.onBreak(true), .pause): freeze(); phase = .onBreak(running: false)
         case (.focusing(false), .resume): resumeClock(); phase = .focusing(running: true)
@@ -82,10 +79,18 @@ final class SessionEngine {
         case (.onBreak, .endBreak): endDate = nil; remaining = 0; phase = .breakOver
         case (.breakOver, .newSession):
             // NOTE: next-session length settings take precedence over the old session length.
-            if !startNextPlanItem() { planItemID = nil; begin(minutes: settings.focusMinutes, isBreak: false) }
+            // A finished plan is cleared, so the new session doesn't carry its last task's title.
+            if !settings.plan.isEmpty && settings.pendingPlan.isEmpty { settings.clearPlan() }
+            if !startNextPlanItem() { startFreeFocus() }
         default: return false
         }
         return true
+    }
+    private func startFreeFocus() {
+        let trimmed = settings.lastTask.trimmingCharacters(in: .whitespacesAndNewlines)
+        task = trimmed.isEmpty ? "Focus time" : trimmed
+        planItemID = nil
+        begin(minutes: settings.focusMinutes, isBreak: false)
     }
     private func startNextPlanItem() -> Bool {
         guard let next = settings.pendingPlan.first else { return false }

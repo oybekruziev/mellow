@@ -35,6 +35,8 @@ final class PanelController: NSObject, NSWindowDelegate {
     private var homeTopRight: NSPoint?
     /// True from hide() until the panel is ordered out or show() takes over.
     private var hiding = false
+    /// Where a running show() animation is taking the glass, so a hide() mid-way keeps the real home.
+    private var showTarget: NSPoint?
     private var mouseMonitors: [Any] = []
     private var reduceMotion: Bool { NSWorkspace.shared.accessibilityDisplayShouldReduceMotion }
 
@@ -65,11 +67,16 @@ final class PanelController: NSObject, NSWindowDelegate {
         container.addSubview(host)
         panel.contentView = container
 
-        let screen = NSScreen.main ?? NSScreen.screens.first!
-        let saved = model.settings.defaults.array(forKey: positionKey(screen)) as? [Double]
-        let topRight = saved.flatMap { $0.count == 2 ? NSPoint(x: $0[0], y: $0[1]) : nil }
-            ?? NSPoint(x: screen.visibleFrame.maxX - 18, y: screen.visibleFrame.maxY - 14)
-        place(topRight: topRight)
+        let defaults = model.settings.defaults
+        let mainScreen = NSScreen.main ?? NSScreen.screens.first
+        let saved = (defaults.array(forKey: Self.positionKey)
+            ?? mainScreen.flatMap { defaults.array(forKey: "panelTopRight.\($0.localizedName)") }) as? [Double]
+        let savedPoint = saved.flatMap { $0.count == 2 ? NSPoint(x: $0[0], y: $0[1]) : nil }
+        // Come back on whichever display the panel was left on, if it is still connected.
+        let screen = savedPoint.flatMap { point in NSScreen.screens.first { $0.frame.insetBy(dx: -1, dy: -1).contains(point) } }
+            ?? mainScreen
+        let fallback = screen.map { NSPoint(x: $0.visibleFrame.maxX - 18, y: $0.visibleFrame.maxY - 14) } ?? .zero
+        place(topRight: savedPoint.flatMap { point in screen?.frame.insetBy(dx: -1, dy: -1).contains(point) == true ? point : nil } ?? fallback)
         clampToScreen()
         installMouseGate()
     }
@@ -89,7 +96,7 @@ final class PanelController: NSObject, NSWindowDelegate {
     private func origin(forTopRight point: NSPoint) -> NSPoint {
         NSPoint(x: point.x + inset - panel.frame.width, y: point.y + inset - panel.frame.height)
     }
-    private func positionKey(_ screen: NSScreen) -> String { "panelTopRight.\(screen.localizedName)" }
+    private static let positionKey = "panelTopRight"
 
     /// Called from SwiftUI layout with the content's final size. The canvas only ever grows,
     /// and it grows on the next run-loop turn — never inside the layout pass.
@@ -144,6 +151,7 @@ final class PanelController: NSObject, NSWindowDelegate {
 
     /// The window takes the mouse only while the pointer is over the glass (and not mid-animation).
     func updateMouseGate() {
+        guard panel.isVisible else { return }
         let inside = glassFrame.insetBy(dx: -2, dy: -2).contains(NSEvent.mouseLocation)
         let ignore = hiding || model.dismissing || !inside
         if panel.ignoresMouseEvents != ignore { panel.ignoresMouseEvents = ignore }
@@ -155,6 +163,8 @@ final class PanelController: NSObject, NSWindowDelegate {
         if panel.isVisible && !hiding { return }
         hiding = false
         if reduceMotion {
+            homeTopRight = nil
+            showTarget = nil
             model.dismissing = false
             if !panel.isVisible { panel.alphaValue = 0; panel.orderFrontRegardless() }
             NSAnimationContext.runAnimationGroup { $0.duration = 0.2; panel.animator().alphaValue = 1 }
@@ -170,11 +180,15 @@ final class PanelController: NSObject, NSWindowDelegate {
             panel.orderFrontRegardless()
         }
         homeTopRight = nil
+        showTarget = home
         // Let the tucked state render once before animating out of it.
         DispatchQueue.main.async { [self] in
+            guard !hiding else { return } // hidden again before the animation began
             withAnimation(.spring(duration: 0.55, bounce: 0.18)) { model.dismissing = false }
             animateOrigin(to: origin(forTopRight: home), duration: 0.5, timing: .init(controlPoints: 0.16, 1, 0.3, 1)) { [self] in
-                if !hiding { clampToScreen(); updateMouseGate() }
+                guard !hiding else { return }
+                showTarget = nil
+                clampToScreen(); updateMouseGate()
             }
         }
     }
@@ -193,7 +207,8 @@ final class PanelController: NSObject, NSWindowDelegate {
             }
             return
         }
-        let home = glassTopRight
+        let home = showTarget ?? glassTopRight
+        showTarget = nil
         homeTopRight = home
         withAnimation(.easeIn(duration: 0.28)) { model.dismissing = true }
         animateOrigin(to: origin(forTopRight: tuckedTopRight(from: home)), duration: 0.32, timing: .init(controlPoints: 0.55, 0, 0.75, 0.3)) { [self] in
@@ -212,8 +227,8 @@ final class PanelController: NSObject, NSWindowDelegate {
            item.frame.width > 0, NSScreen.screens.contains(where: { $0.frame.intersects(item.frame) }) {
             target = NSPoint(x: item.frame.midX, y: item.frame.minY)
         } else {
-            let screen = panel.screen ?? NSScreen.main ?? NSScreen.screens[0]
-            target = NSPoint(x: topCenter.x, y: screen.frame.maxY)
+            let top = (panel.screen ?? NSScreen.main ?? NSScreen.screens.first)?.frame.maxY ?? home.y + 40
+            target = NSPoint(x: topCenter.x, y: top)
         }
         return NSPoint(x: home.x + target.x - topCenter.x, y: home.y + target.y - topCenter.y)
     }
@@ -242,8 +257,8 @@ final class PanelController: NSObject, NSWindowDelegate {
     }
 
     func windowDidMove(_ notification: Notification) {
-        guard !programmaticMove, homeTopRight == nil, let screen = panel.screen else { return }
+        guard !programmaticMove, homeTopRight == nil, showTarget == nil, panel.screen != nil else { return }
         let point = glassTopRight
-        model.settings.defaults.set([Double(point.x), Double(point.y)], forKey: positionKey(screen))
+        model.settings.defaults.set([Double(point.x), Double(point.y)], forKey: Self.positionKey)
     }
 }

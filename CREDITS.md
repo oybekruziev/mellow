@@ -12,7 +12,7 @@ Mellow is free to download and use. Third-party material bundled in the app:
 
 CC0 does not require attribution; it is listed here as a courtesy and as a record of where each file came from (downloaded 2026-10-03). The app bundles 160 kbps AAC re-encodes; the original mp3 files are kept in `Mellow-handoff/Music-original/`.
 
-Social link icons (Instagram, X, Threads, LinkedIn) are simplified outline glyphs drawn for Mellow. The brand names are trademarks of their owners and are used only to link to the author's profiles.
+Social link icons (Instagram, X, Threads, LinkedIn, YouTube) are simplified outline glyphs drawn for Mellow. The brand names are trademarks of their owners and are used only to link to the author's profiles.
 
 ## Lucide license (ISC)
 

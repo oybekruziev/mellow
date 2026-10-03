@@ -26,8 +26,11 @@ final class DailyStats {
         count = 0
         save()
     }
-    func earnFlower(at date: Date) {
+    /// `endedAt` is when the session actually ended; if that was on an earlier day
+    /// (the Mac slept through midnight), today's count is left alone.
+    func earnFlower(at date: Date, endedAt: Date? = nil) {
         resetIfNeeded(at: date)
+        if let endedAt, key(for: endedAt) != dayKey { return }
         count += 1
         save()
     }

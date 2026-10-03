@@ -1,15 +1,15 @@
 import SwiftUI
 
-/// The author of Mellow. Paste a profile link into `url` (with or without https://);
-/// until then the icon stays visible but inactive.
+/// The author of Mellow and their profiles. An empty `url` shows the icon as inactive.
 enum Creator {
     static let name = "Oybek Ruziev"
     static let links: [(icon: Icon, title: String, url: String)] = [
-        (.instagram, "Instagram", ""),
-        (.x, "X (Twitter)", ""),
-        (.linkedin, "LinkedIn", ""),
-        (.threads, "Threads", ""),
-        (.youtube, "YouTube", ""),
+        (.instagram, "Instagram", "https://www.instagram.com/ruziev_oybek_/"),
+        (.x, "X (Twitter)", "https://x.com/aidan_creates"),
+        (.linkedin, "LinkedIn", "https://www.linkedin.com/in/oybekruziev/"),
+        (.threads, "Threads", "https://www.threads.com/@ruziev_oybek_"),
+        (.youtube, "YouTube", "https://www.youtube.com/@aidancreatesspace"),
+        (.globe, "Website", "https://aidancreates.space/"),
     ]
     static func url(_ text: String) -> URL? {
         let text = text.trimmingCharacters(in: .whitespaces)
@@ -55,6 +55,8 @@ struct PressableStyle: ButtonStyle {
 }
 
 struct MadeBySection: View {
+    /// The welcome can't replay over a running session.
+    var replayDisabled = false
     var onReplayWelcome: (() -> Void)? = nil
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -72,6 +74,8 @@ struct MadeBySection: View {
             if let onReplayWelcome {
                 Button("Show Welcome Again", action: onReplayWelcome)
                     .buttonStyle(.plain).font(.system(size: 11, weight: .medium)).foregroundStyle(Palette.focus)
+                    .disabled(replayDisabled).opacity(replayDisabled ? 0.45 : 1)
+                    .help(replayDisabled ? "Available when no session is running" : "Show the first-run setup again")
             }
         }
         .padding(.horizontal, 12).padding(.vertical, 10)

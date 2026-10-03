@@ -19,6 +19,8 @@ enum Palette {
     static let panelWash = Color(light: .white.withAlphaComponent(0.74), dark: .black.withAlphaComponent(0.68))
     static let panelEdge = Color(light: .white.withAlphaComponent(0.65), dark: .white.withAlphaComponent(0.15))
     static let control = Color(light: .white.withAlphaComponent(0.75), dark: .white.withAlphaComponent(0.13))
+    /// Outline of an off switch, so it reads on a white section too.
+    static let switchEdge = Color(light: .black.withAlphaComponent(0.14), dark: .white.withAlphaComponent(0.16))
     static let controlEdge = Color(light: .white.withAlphaComponent(0.70), dark: .white.withAlphaComponent(0.12))
     static let field = Color(light: .white.withAlphaComponent(0.42), dark: .white.withAlphaComponent(0.07))
     static let section = Color(light: .white.withAlphaComponent(0.55), dark: .white.withAlphaComponent(0.06))
@@ -254,7 +256,7 @@ struct MiniSwitchStyle: ToggleStyle {
                 configuration.label.frame(maxWidth: .infinity, alignment: .leading)
                 Capsule()
                     .fill(configuration.isOn ? Palette.focus : Palette.segmentTrack)
-                    .overlay { Capsule().strokeBorder(.black.opacity(configuration.isOn ? 0 : 0.06), lineWidth: 0.5) }
+                    .overlay { Capsule().strokeBorder(Palette.switchEdge.opacity(configuration.isOn ? 0 : 1), lineWidth: 1) }
                     .frame(width: 32, height: 18)
                     .overlay(alignment: configuration.isOn ? .trailing : .leading) {
                         Circle().fill(.white).frame(width: 14, height: 14)
@@ -316,8 +318,17 @@ struct MinuteStepper: View {
 struct TodayRow: View {
     let stats: DailyStats
     var justCompleted = false
+    /// A shorter label when the music controls share the row.
+    var short = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @State private var bloomed = true
+    @State private var bloomed: Bool
+    init(stats: DailyStats, justCompleted: Bool = false, short: Bool = false) {
+        self.stats = stats
+        self.justCompleted = justCompleted
+        self.short = short
+        // Start hidden when a flower is about to bloom, so it doesn't flash for a frame first.
+        _bloomed = State(initialValue: !justCompleted)
+    }
     var body: some View {
         let shown = max(1, min(5, stats.count))
         HStack(spacing: 8) {
@@ -333,7 +344,7 @@ struct TodayRow: View {
             if stats.count > 5 {
                 Text("+\(stats.count - 5)").font(.system(size: 11, weight: .medium)).foregroundStyle(Palette.secondary)
             }
-            Text(stats.label)
+            Text(short && stats.count > 0 ? "\(stats.count) today" : stats.label)
                 .font(.system(size: justCompleted ? 11 : 12, weight: justCompleted ? .medium : .regular))
                 .foregroundStyle(justCompleted ? Palette.primary : Palette.secondary)
                 .lineLimit(1)
@@ -367,4 +378,9 @@ struct ProgressCapsule: View {
             .accessibilityLabel("Session progress")
             .accessibilityValue("\(Int(value * 100)) percent")
     }
+}
+
+extension EnvironmentValues {
+    /// False while the panel is hidden or tucking away; looping animations pause.
+    @Entry var panelAnimating = true
 }

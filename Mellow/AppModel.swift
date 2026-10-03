@@ -16,6 +16,8 @@ final class AppModel: NSObject {
     var panelVisible = true
     var settingsOpen = false
     var taskFocusRequest = 0
+    /// Set when ⌘L expands the capsule: the task field is focused once the panel appears.
+    @ObservationIgnored var pendingTaskFocus = false
     @ObservationIgnored var panelController: PanelController?
     @ObservationIgnored private var ticker: Timer?
     @ObservationIgnored private var keyMonitor: Any?
@@ -40,14 +42,11 @@ final class AppModel: NSObject {
             if settings.soundOn { playChime() }
             setCompact(false)
             showPanel()
-            announce(isBreak ? "Break over" : "Session complete. You grew a flower.")
+            announce(isBreak ? "Break over" : "Session complete. \(settings.companion.completionTitle)")
         }
-        ticker = Timer.scheduledTimer(withTimeInterval: 0.25, repeats: true) { [weak self] _ in
-            Task { @MainActor in self?.engine.refresh() }
-        }
-        ticker?.tolerance = 0.05
-        if let ticker { RunLoop.main.add(ticker, forMode: .common) }
+        observeRunning()
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(woke), name: NSWorkspace.didWakeNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(dayChanged), name: .NSCalendarDayChanged, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(displaysChanged), name: NSApplication.didChangeScreenParametersNotification, object: nil)
         keyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
             let handled = MainActor.assumeIsolated { self?.handleKey(event) == nil }
@@ -56,9 +55,32 @@ final class AppModel: NSObject {
         showPanel()
     }
     @objc private func woke() { engine.refresh(); panelController?.clampToScreen() }
+    @objc private func dayChanged() { engine.refresh() }
+    /// The clock ticks only while a timer runs, so an idle Mellow doesn't wake the CPU.
+    private func observeRunning() {
+        let running = withObservationTracking { engine.phase.isRunning } onChange: { [weak self] in
+            Task { @MainActor in self?.observeRunning() }
+        }
+        if running, ticker == nil {
+            let timer = Timer(timeInterval: 0.25, repeats: true) { [weak self] _ in
+                MainActor.assumeIsolated { self?.engine.refresh() }
+            }
+            timer.tolerance = 0.05
+            RunLoop.main.add(timer, forMode: .common)
+            ticker = timer
+        } else if !running {
+            ticker?.invalidate()
+            ticker = nil
+        }
+    }
     @objc private func displaysChanged() { panelController?.clampToScreen() }
     func showPanel() { panelVisible = true; panelController?.show() }
-    func hidePanel() { settingsOpen = false; panelVisible = false; panelController?.hide() }
+    func hidePanel() {
+        settingsOpen = false; panelVisible = false
+        // The onboarding music preview has no control once the panel is gone.
+        if onboarding && music.isPlaying { music.pause() }
+        panelController?.hide()
+    }
     func togglePanel() { panelVisible ? hidePanel() : showPanel() }
     func toggleCompact() {
         guard !onboarding else { return }
@@ -74,6 +96,7 @@ final class AppModel: NSObject {
         showPanel()
         withAnimation(morph) { compact = false; onboarding = true }
     }
+    static let focusPresets = [15, 25, 45, 60]
     /// The spring used for every panel shape change.
     var morph: Animation {
         NSWorkspace.shared.accessibilityDisplayShouldReduceMotion ? .easeInOut(duration: 0.2) : .spring(duration: 0.5, bounce: 0.14)
@@ -83,13 +106,18 @@ final class AppModel: NSObject {
         withAnimation(morph) { compact = value }
     }
     func openSettings() {
+        // Onboarding already shows every setting, and the popover's button isn't on screen.
+        guard !onboarding else { showPanel(); return }
         // Present the popover only once the panel has finished appearing or expanding,
         // otherwise it anchors to a button that is still moving.
         let settle = !panelVisible || compact || dismissing
         setCompact(false)
         showPanel()
         if settle {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in self?.settingsOpen = true }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+                guard let self, panelVisible, !compact, !onboarding else { return }
+                settingsOpen = true
+            }
         } else {
             settingsOpen = true
         }
@@ -113,6 +141,7 @@ final class AppModel: NSObject {
         }
     }
     func endAction() {
+        if case .confirmEnd = engine.phase { setCompact(false); showPanel(); return }
         if engine.phase.isBreak { act(.endBreak) }
         else if engine.send(.requestEnd) { setCompact(false); showPanel() }
     }
@@ -159,6 +188,7 @@ final class AppModel: NSObject {
             case "q": NSApp.terminate(nil)
             case "l":
                 guard engine.phase == .ready else { return event }
+                pendingTaskFocus = compact
                 setCompact(false); showPanel(); panelController?.panel.makeKey(); taskFocusRequest += 1
             default: return event
             }
@@ -175,9 +205,13 @@ final class AppModel: NSObject {
         guard !settingsOpen else { return event }
         if event.keyCode == 36 && !textEditing { primaryAction(); return nil }
         guard !textEditing else { return event }
-        if key == " " { primaryAction(); return nil }
-        if engine.phase == .ready, let index = ["1", "2", "3"].firstIndex(of: key) {
-            settings.focusMinutes = [15, 25, 45][index]; return nil
+        // In the end confirmation Space belongs to whichever button has keyboard focus.
+        if key == " " {
+            if case .confirmEnd = engine.phase { return event }
+            primaryAction(); return nil
+        }
+        if engine.phase == .ready, settings.pendingPlan.isEmpty, let index = ["1", "2", "3", "4"].firstIndex(of: key) {
+            settings.focusMinutes = Self.focusPresets[index]; return nil
         }
         return event
     }

@@ -13,6 +13,8 @@ struct PanelRootView: View {
                 GlassBackground().frame(width: glassSize.width, height: glassSize.height)
             }
             ZStack(alignment: .topTrailing) { content }
+                // Sprites and the equalizer stop drawing while the panel is tucked away.
+                .environment(\.panelAnimating, model.panelVisible && !model.dismissing)
                 // Content never shows outside the glass while the glass is still growing or shrinking.
                 .mask(alignment: .topTrailing) {
                     RoundedRectangle(cornerRadius: 26, style: .continuous)
@@ -31,7 +33,7 @@ struct PanelRootView: View {
         .onChange(of: model.settings.keepOnTop) { model.panelController?.panel.level = model.settings.keepOnTop ? .floating : .normal }
         .onChange(of: model.settings.soundOn) { _, on in if on { model.playChime() } }
         .onChange(of: model.engine.phase) { model.syncMusic() }
-        .onChange(of: model.settings.musicDuringFocus) { model.syncMusic() }
+        .onChange(of: model.settings.musicDuringFocus) { if model.engine.phase.isActive { model.syncMusic() } }
         .onChange(of: model.settings.musicVolume) { _, volume in model.music.volume = volume }
     }
 
@@ -95,6 +97,11 @@ struct PanelView: View {
         .background { if glass { GlassBackground() } }
         .animation(reduceMotion ? nil : .smooth(duration: 0.35), value: phase)
         .onChange(of: model.taskFocusRequest) { taskFocused = true }
+        .onAppear {
+            guard model.pendingTaskFocus else { return }
+            model.pendingTaskFocus = false
+            DispatchQueue.main.async { taskFocused = true }
+        }
     }
 
     // MARK: Header
@@ -123,7 +130,7 @@ struct PanelView: View {
     private var planSuffix: String { engine.planPosition.map { " · \($0.index) of \($0.count)" } ?? "" }
     private func todayRow(justCompleted: Bool = false) -> some View {
         HStack(spacing: 4) {
-            TodayRow(stats: engine.stats, justCompleted: justCompleted)
+            TodayRow(stats: engine.stats, justCompleted: justCompleted, short: model.music.isPlaying)
             MusicControl(music: model.music)
         }
     }
@@ -197,9 +204,12 @@ struct PanelView: View {
     private var readyContent: some View {
         Group {
             HStack(spacing: 4) {
-                TextField("", text: $model.settings.lastTask)
+                TextField("What are you working on?", text: $model.settings.lastTask, prompt: Text(""))
+                    .labelsHidden()
                     .textFieldStyle(.plain).font(.system(size: 13)).tracking(-0.065)
                     .focusEffectDisabled()
+                    .focused($taskFocused)
+                    .onSubmit(submitTask)
                     .background(alignment: .leading) {
                         if model.settings.lastTask.isEmpty {
                             Text(model.settings.plan.isEmpty ? "What are you working on?" : "Add another task")
@@ -221,10 +231,7 @@ struct PanelView: View {
                     Capsule().strokeBorder(taskFocused ? Palette.focus : Palette.controlEdge, lineWidth: taskFocused ? 1.5 : 0.5)
                 }
                 .animation(.easeOut(duration: 0.15), value: taskFocused)
-                .focused($taskFocused)
-                .onSubmit(submitTask)
                 .help(model.settings.lastTask.isEmpty ? "What are you working on?" : model.settings.lastTask)
-                .accessibilityLabel("What are you working on?")
             if !model.settings.plan.isEmpty {
                 PlanList(settings: model.settings)
                     .transition(.opacity.combined(with: .move(edge: .top)))
@@ -233,13 +240,17 @@ struct PanelView: View {
                 timerText
                 Spacer(minLength: 0)
                 PushButton(title: "Start Focus", icon: .play, tint: Palette.focus, height: 36) {
-                    taskFocused = false
                     if !model.settings.plan.isEmpty && !model.settings.lastTask.trimmingCharacters(in: .whitespaces).isEmpty { addToPlan() }
+                    taskFocused = false
                     model.act(.startFocus)
                 }
             }
-            SegmentedPicker(options: [15, 25, 45].map { ($0, "\($0) min") },
-                            selection: $model.settings.focusMinutes, label: "Focus length")
+            // With a plan, each task has its own length (± on the row), so the preset picker steps aside.
+            if model.settings.pendingPlan.isEmpty {
+                SegmentedPicker(options: AppModel.focusPresets.map { ($0, "\($0) min") },
+                                selection: $model.settings.focusMinutes, label: "Focus length")
+                    .transition(.opacity)
+            }
             todayRow()
         }
     }
@@ -315,7 +326,7 @@ struct PanelView: View {
             .frame(height: 50)
             .contentTransition(.numericText(countsDown: true))
             .animation(reduceMotion ? nil : .snappy(duration: 0.25), value: engine.formattedTime)
-            .accessibilityLabel("\(engine.formattedTime) remaining")
+            .accessibilityLabel(phase.isActive ? "\(engine.formattedTime) remaining" : "Focus length \(engine.formattedTime)")
     }
 }
 
@@ -361,7 +372,7 @@ struct CompactView: View {
                         .foregroundStyle(paused ? Palette.secondary : Palette.primary)
                     Text(caption).font(.system(size: 12)).foregroundStyle(Palette.secondary)
                 }
-                .lineLimit(1)
+                .lineLimit(1).minimumScaleFactor(0.8)
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             .contentShape(Rectangle())

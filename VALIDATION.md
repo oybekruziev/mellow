@@ -91,3 +91,38 @@ Still to verify on device: the morph, the menu bar tuck animation, single-click 
   Settings shares the same section views; "Show Welcome Again" reopens it.
 - Snapshots `13-onboarding-1…4.png`.
 - Stress: 150 cycles each at 20 ms, 150 ms and 500 ms, now including onboarding open/close. All clean. The stress run restores the real `onboarded` flag afterwards.
+
+## Full audit, second pass (2026-10-03)
+
+Two review passes, one on window/engine/concurrency and one on SwiftUI/UX/accessibility. Fixed:
+
+- **Window:**
+  - Hiding the panel while it was still sliding out of the menu bar saved a half-way spot as its home. It now returns to its real position.
+  - The position is saved once and restored on whichever display it was left on. Before, it was saved per display name and read back only for the main display.
+  - No crash when no display is attached (clamshell login).
+  - Toggling Reduce Motion between hide and show no longer stops the position from being saved.
+- **Energy:**
+  - The clock timer runs only while a timer is running. An idle or hidden Mellow no longer wakes 4×/s; the midnight reset uses `NSCalendarDayChanged`.
+  - The mouse gate is skipped while the panel is hidden.
+  - Mascot sprites and the music equalizer stop drawing while the panel is hidden.
+- **Engine:**
+  - "New Session" after a finished plan clears the plan and uses the task field, not the last plan task's title.
+  - A session that ended before midnight while the Mac slept no longer counts for the next day.
+- **Behavior:**
+  - Settings can't be queued during onboarding and pop up later. The delayed open is also cancelled if the panel was hidden or collapsed in the meantime.
+  - ⌘L from the compact capsule now focuses the task field.
+  - The menu's "End Session" during the end confirmation shows the panel instead of doing nothing.
+  - Space no longer triggers "Keep Going" while the end confirmation has a focused button.
+  - The quit alert takes keyboard focus.
+  - With a plan, the focus-length presets step aside, since each task has its own length; presets now match onboarding (15/25/45/60, keys 1–4).
+  - Turning "music during focus" on no longer stops the onboarding preview; ⌘W during onboarding stops it.
+  - "Show Welcome Again" is disabled, with a tooltip, while a session runs.
+  - The onboarding button is now "Done" with a check, since it does not start a timer.
+- **Look and accessibility:**
+  - Labels added for icon-only buttons (plan row remove/±, next track, music preview); plan rows are adjustable with VoiceOver and the keyboard.
+  - The task field carries its own label and focus.
+  - The timer reads "Focus length" when idle.
+  - No one-frame flower flash before it blooms; a short "N today" label when the music controls share the row.
+  - Compact text shrinks slightly instead of truncating.
+  - The off switch has a visible outline in Light.
+- **Verification:** 13 unit tests (2 new), 17 snapshots, and a 150-cycle stress run at 60 ms all pass.

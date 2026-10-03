@@ -74,6 +74,7 @@ private struct PlanRow: View {
                 IconImage(.close, size: 12).foregroundStyle(Palette.secondary).frame(width: 18, height: 18).contentShape(Rectangle())
             }
             .buttonStyle(.plain).opacity(hover ? 1 : 0).help("Remove Task")
+            .accessibilityLabel("Remove \(item.title)")
         }
         .padding(.leading, 8).padding(.trailing, 6)
         .frame(height: 30)
@@ -82,6 +83,15 @@ private struct PlanRow: View {
         .animation(.easeOut(duration: 0.12), value: hover)
         .accessibilityElement(children: .contain)
         .accessibilityLabel("\(item.title), \(item.minutes) minutes\(item.done ? ", done" : "")")
+        // Keyboard and VoiceOver users can't hover, so the length is also adjustable directly.
+        .accessibilityAdjustableAction { direction in
+            guard !item.done else { return }
+            switch direction {
+            case .increment: settings.setMinutes(item.minutes + 5, for: item.id)
+            case .decrement: settings.setMinutes(item.minutes - 5, for: item.id)
+            @unknown default: break
+            }
+        }
     }
     private func stepButton(_ icon: Icon, delta: Int) -> some View {
         Button {
@@ -91,6 +101,7 @@ private struct PlanRow: View {
         }
         .buttonStyle(.plain)
         .help(delta > 0 ? "Longer" : "Shorter")
+        .accessibilityLabel(delta > 0 ? "Make \(item.title) longer" : "Make \(item.title) shorter")
     }
 }
 
@@ -106,7 +117,7 @@ struct MusicControl: View {
                     Button { music.next() } label: {
                         IconImage(.skip, size: 11).frame(width: 22, height: 22)
                     }
-                    .buttonStyle(ToolbarStyle()).help("Next Track")
+                    .buttonStyle(ToolbarStyle()).help("Next Track").accessibilityLabel("Next Track")
                 }
                 Button { withAnimation(.snappy) { music.toggle() } } label: {
                     IconImage(music.isPlaying ? .pause : .music, size: 12).frame(width: 22, height: 22)
@@ -121,8 +132,9 @@ struct MusicControl: View {
 
 private struct Equalizer: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.panelAnimating) private var animating
     var body: some View {
-        TimelineView(.animation(minimumInterval: 1 / 12, paused: reduceMotion)) { context in
+        TimelineView(.animation(minimumInterval: 1 / 12, paused: reduceMotion || !animating)) { context in
             let t = context.date.timeIntervalSinceReferenceDate
             HStack(alignment: .bottom, spacing: 2) {
                 ForEach(0..<3) { bar in

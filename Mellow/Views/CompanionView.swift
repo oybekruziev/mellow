@@ -14,6 +14,7 @@ struct CompanionView: View {
     var size: CGFloat = 46
     var preview = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.panelAnimating) private var animating
 
     private static let fps = 5.0
     private var sprite: SpriteFrames { SpriteFrames.for(type) }
@@ -21,10 +22,10 @@ struct CompanionView: View {
 
     var body: some View {
         Group {
-            if !preview, !reduceMotion, phase.isRunning, !finished {
+            if !preview, !reduceMotion, animating, phase.isRunning, !finished {
                 // Redraw only at the sprite's frame rate.
                 TimelineView(.periodic(from: .now, by: 1 / Self.fps)) { context in art(frame(at: context.date)) }
-            } else if !preview, !reduceMotion, finished, let completedAt,
+            } else if !preview, !reduceMotion, animating, finished, let completedAt,
                       Date.now.timeIntervalSince(completedAt) < Double(sprite.finale.count) / Self.fps {
                 // The finale: one redraw per frame, then it stops on the last pose.
                 TimelineView(.explicit((0...sprite.finale.count).map { completedAt.addingTimeInterval(Double($0) / Self.fps) })) { context in
