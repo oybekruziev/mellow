@@ -1,0 +1,22 @@
+// !$*UTF8*$!
+{
+ archiveVersion = 1; classes = {}; objectVersion = 77;
+ objects = {
+  A10000000000000000000001 = {isa = PBXProject; attributes = {BuildIndependentTargetsInParallel = YES; LastUpgradeCheck = 2700;}; buildConfigurationList = A10000000000000000000002; compatibilityVersion = "Xcode 16.0"; developmentRegion = en; knownRegions = (en, Base); mainGroup = A10000000000000000000003; productRefGroup = A10000000000000000000004; projectDirPath = ""; projectRoot = ""; targets = (A10000000000000000000005);};
+  A10000000000000000000002 = {isa = XCConfigurationList; buildConfigurations = (A10000000000000000000010, A10000000000000000000011); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release;};
+  A10000000000000000000003 = {isa = PBXGroup; children = (A10000000000000000000006, A10000000000000000000007, A10000000000000000000004); sourceTree = "<group>";};
+  A10000000000000000000004 = {isa = PBXGroup; children = (A10000000000000000000008); name = Products; sourceTree = "<group>";};
+  A10000000000000000000005 = {isa = PBXNativeTarget; buildConfigurationList = A10000000000000000000009; buildPhases = (A10000000000000000000012, A10000000000000000000013, A10000000000000000000014); buildRules = (); dependencies = (); fileSystemSynchronizedGroups = (A10000000000000000000006, A10000000000000000000007); name = Mellow; productName = Mellow; productReference = A10000000000000000000008; productType = "com.apple.product-type.application";};
+  A10000000000000000000006 = {isa = PBXFileSystemSynchronizedRootGroup; path = Mellow; sourceTree = "<group>";};
+  A10000000000000000000007 = {isa = PBXFileSystemSynchronizedRootGroup; path = Sources/MellowCore; sourceTree = "<group>";};
+  A10000000000000000000008 = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Mellow.app; sourceTree = BUILT_PRODUCTS_DIR;};
+  A10000000000000000000009 = {isa = XCConfigurationList; buildConfigurations = (A10000000000000000000015, A10000000000000000000016); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release;};
+  A10000000000000000000010 = {isa = XCBuildConfiguration; buildSettings = {CLANG_ENABLE_MODULES = YES; MACOSX_DEPLOYMENT_TARGET = 26.0; SDKROOT = macosx;}; name = Debug;};
+  A10000000000000000000011 = {isa = XCBuildConfiguration; buildSettings = {CLANG_ENABLE_MODULES = YES; MACOSX_DEPLOYMENT_TARGET = 26.0; SDKROOT = macosx;}; name = Release;};
+  A10000000000000000000012 = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0;};
+  A10000000000000000000013 = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0;};
+  A10000000000000000000014 = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0;};
+  A10000000000000000000015 = {isa = XCBuildConfiguration; buildSettings = {ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon; ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor; CODE_SIGN_STYLE = Automatic; CODE_SIGN_IDENTITY = "-"; ENABLE_APP_SANDBOX = YES; GENERATE_INFOPLIST_FILE = YES; INFOPLIST_KEY_LSUIElement = YES; INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity"; INFOPLIST_KEY_CFBundleDisplayName = Mellow; INFOPLIST_KEY_NSHumanReadableCopyright = "© 2026 Oybek Ruziev"; PRODUCT_BUNDLE_IDENTIFIER = uz.oybek.Mellow; PRODUCT_NAME = "$(TARGET_NAME)"; SWIFT_VERSION = 6.0; SWIFT_OPTIMIZATION_LEVEL = "-Onone"; SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG; CURRENT_PROJECT_VERSION = 1; MARKETING_VERSION = 1.0;}; name = Debug;};
+  A10000000000000000000016 = {isa = XCBuildConfiguration; buildSettings = {ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon; ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor; CODE_SIGN_STYLE = Automatic; CODE_SIGN_IDENTITY = "-"; ENABLE_APP_SANDBOX = YES; GENERATE_INFOPLIST_FILE = YES; INFOPLIST_KEY_LSUIElement = YES; INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity"; INFOPLIST_KEY_CFBundleDisplayName = Mellow; INFOPLIST_KEY_NSHumanReadableCopyright = "© 2026 Oybek Ruziev"; PRODUCT_BUNDLE_IDENTIFIER = uz.oybek.Mellow; PRODUCT_NAME = "$(TARGET_NAME)"; SWIFT_VERSION = 6.0; SWIFT_COMPILATION_MODE = wholemodule; ENABLE_HARDENED_RUNTIME = YES; CURRENT_PROJECT_VERSION = 1; MARKETING_VERSION = 1.0;}; name = Release;};
+ }; rootObject = A10000000000000000000001;
+}

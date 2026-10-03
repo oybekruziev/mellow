@@ -1,0 +1,10 @@
+.DS_Store
+.build/
+Build/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+.claude/settings.local.json
+# Same files as Mellow-handoff/; re-downloadable originals listed in CREDITS.md
+Mellow-handoff_1.zip
+Mellow-handoff/Music-original/
