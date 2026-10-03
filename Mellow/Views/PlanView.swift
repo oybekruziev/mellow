@@ -3,6 +3,7 @@ import SwiftUI
 /// The task plan shown in Ready: each task has its own length; breaks run between tasks.
 struct PlanList: View {
     @Bindable var settings: Settings
+    var onEdit: () -> Void = {}
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             ScrollView {
@@ -19,6 +20,10 @@ struct PlanList: View {
             HStack {
                 Text(summary).font(.system(size: 11)).foregroundStyle(Palette.secondary)
                 Spacer()
+                Button("Edit", action: onEdit)
+                    .buttonStyle(.plain).font(.system(size: 11, weight: .medium)).foregroundStyle(Palette.focus)
+                    .help("Edit Plan — names, times and breaks")
+                    .padding(.trailing, 8)
                 Button("Clear") { withAnimation(.snappy) { settings.clearPlan() } }
                     .buttonStyle(.plain).font(.system(size: 11, weight: .medium)).foregroundStyle(Palette.secondary)
                     .help("Clear Plan")

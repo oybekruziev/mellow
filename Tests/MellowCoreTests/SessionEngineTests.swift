@@ -48,6 +48,7 @@ struct SessionEngineTests {
             (.confirmEnd(resumeRunning: false), .confirmEnd, .ready),
             (.complete, .startBreak, .onBreak(running: true)),
             (.complete, .later, .ready),
+            (.complete, .extend, .focusing(running: true)),
             (.onBreak(running: true), .pause, .onBreak(running: false)),
             (.onBreak(running: false), .resume, .onBreak(running: true)),
             (.onBreak(running: true), .endBreak, .breakOver),
@@ -187,5 +188,51 @@ struct SessionEngineTests {
         f.advance(36 * 3600) // the Mac slept through the end and into another day
         #expect(f.engine.phase == .complete)
         #expect(f.stats.count == 0)
+    }
+
+    @Test func choosingAfterEachTaskOffersBreakNextOrMoreTime() {
+        let f = Fixture()
+        f.settings.planAutoBreak = false
+        f.settings.addPlanItem("Draft", minutes: 10)
+        f.settings.addPlanItem("Polish", minutes: 20)
+        f.engine.send(.startFocus); f.advance(600)
+        #expect(f.engine.phase == .complete && f.stats.count == 1)
+        #expect(f.settings.plan[0].done)
+
+        // Needs more time: same task, five more minutes, still one flower.
+        #expect(f.engine.send(.extend))
+        #expect(f.engine.task == "Draft" && f.engine.total == 300 && !f.settings.plan[0].done)
+        f.advance(300)
+        #expect(f.engine.phase == .complete && f.stats.count == 1 && f.settings.plan[0].done)
+
+        // Skip the break and go straight on.
+        #expect(f.engine.send(.nextTask))
+        #expect(f.engine.task == "Polish" && f.engine.total == 1200)
+        f.advance(1200)
+        #expect(f.engine.phase == .complete && f.stats.count == 2)
+        #expect(!f.engine.send(.nextTask)) // nothing left
+    }
+
+    @Test func finishingATaskEarlyMarksItDoneAndStartsTheBreak() {
+        let f = Fixture()
+        f.settings.addPlanItem("One", minutes: 30)
+        f.settings.addPlanItem("Two", minutes: 30)
+        f.engine.send(.startFocus); f.advance(60)
+        #expect(f.engine.send(.finishTask))
+        #expect(f.settings.plan[0].done && f.stats.count == 1)
+        #expect(f.engine.phase == .onBreak(running: true))
+        f.settings.clearPlan()
+        f.engine.send(.endBreak); f.engine.send(.newSession)
+        #expect(!f.engine.send(.finishTask)) // a free session has no task to finish
+    }
+
+    @Test func savingAPlanKeepsFinishedTasksAndNamesBlankOnes() {
+        let f = Fixture()
+        f.settings.addPlanItem("Done already", minutes: 10)
+        f.settings.plan[0].done = true
+        f.settings.setPendingPlan([PlanItem(title: " ", minutes: 25), PlanItem(title: "Email", minutes: 500)])
+        #expect(f.settings.plan.map(\.title) == ["Done already", "Task 2", "Email"])
+        #expect(f.settings.plan[2].minutes == 120 && f.settings.pendingPlan.count == 2)
+        #expect(Settings(defaults: f.defaults).plan.count == 3)
     }
 }

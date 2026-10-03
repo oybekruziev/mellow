@@ -41,7 +41,7 @@ extension Color {
 
 enum Icon: String {
     case settings, compact, hide, play, pause, stop, check, cup, close, minus, plus
-    case music, skip, expand, instagram, linkedin, x, threads, youtube, globe, mail
+    case music, skip, expand, list, instagram, linkedin, x, threads, youtube, globe, mail
 }
 
 struct IconImage: View {
@@ -275,37 +275,39 @@ struct MinuteStepper: View {
     let title: String
     @Binding var value: Int
     let range: ClosedRange<Int>
+    var step = 1
+    var unit: (Int) -> String = { "\($0) min" }
     var body: some View {
         HStack(spacing: 0) {
-            step(.minus, by: -1, label: "Decrease \(title)")
-            Text("\(value) min")
+            stepButton(.minus, by: -step, label: "Decrease \(title)")
+            Text(unit(value))
                 .font(.system(size: 12, weight: .medium)).monospacedDigit()
                 .contentTransition(.numericText(value: Double(value)))
                 .padding(.horizontal, 4)
-            step(.plus, by: 1, label: "Increase \(title)")
+            stepButton(.plus, by: step, label: "Increase \(title)")
         }
         .frame(height: 26)
         .background(Palette.control.opacity(0.6), in: Capsule())
         .overlay { Capsule().strokeBorder(Palette.controlEdge, lineWidth: 0.5) }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(title)
-        .accessibilityValue("\(value) minutes")
+        .accessibilityValue(unit(value))
         .accessibilityAdjustableAction { direction in
             switch direction {
-            case .increment: change(by: 1)
-            case .decrement: change(by: -1)
+            case .increment: change(by: step)
+            case .decrement: change(by: -step)
             @unknown default: break
             }
         }
     }
-    private func step(_ icon: Icon, by delta: Int, label: String) -> some View {
+    private func stepButton(_ icon: Icon, by delta: Int, label: String) -> some View {
         Button { change(by: delta) } label: {
             IconImage(icon, size: 12).foregroundStyle(Palette.secondary)
                 .frame(width: 26, height: 26).contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .buttonRepeatBehavior(.enabled)
-        .disabled(!range.contains(value + delta))
+        .disabled(delta < 0 ? value <= range.lowerBound : value >= range.upperBound)
         .help(label)
     }
     private func change(by delta: Int) {

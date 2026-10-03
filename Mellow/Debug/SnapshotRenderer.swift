@@ -17,6 +17,7 @@ enum SnapshotRenderer {
             ("6-break", [.startFocus], 1501), ("7-breakover", [.startFocus], 1501),
             ("10-plan", [], 0), ("11-plan-break", [.startFocus], 1501),
             ("14-edge-long", [.startFocus], 5),
+            ("15-plan-choose", [.startFocus], 1501), ("16-plan-focus-long", [.startFocus], 5),
         ]
         for (name, events, advance) in scenarios {
             var clock = Date(timeIntervalSinceReferenceDate: 800_000_000)
@@ -34,6 +35,8 @@ enum SnapshotRenderer {
                 settings.addPlanItem("Reply to design feedback", minutes: 15)
                 settings.addPlanItem("Review pull request", minutes: 45)
             }
+            if name == "15-plan-choose" { settings.planAutoBreak = false }
+            if name == "16-plan-focus-long" { settings.setMinutes(120, for: settings.plan[0].id) }
             if name == "14-edge-long" {
                 settings.focusMinutes = 120
                 settings.lastTask = "Write the quarterly investor update and reply to every single comment in the doc"
@@ -50,6 +53,15 @@ enum SnapshotRenderer {
             if name == "2-focus" {
                 model.compact = true
                 render(CompactView(model: model), to: url.appending(path: "8-compact.png"), dark: dark)
+            }
+            if name == "10-plan" {
+                // Ten tasks: names and times for each, scrolled list.
+                for i in 4...10 { settings.addPlanItem("Task \(i)", minutes: 25) }
+                render(PlanEditorView(model: model).background { GlassBackground() },
+                       to: url.appending(path: "17-plan-editor.png"), dark: dark)
+                settings.clearPlan()
+                render(PlanEditorView(model: model).background { GlassBackground() },
+                       to: url.appending(path: "18-plan-editor-new.png"), dark: dark)
             }
             if name == "1-ready" {
                 render(SettingsView(model: model).background(.regularMaterial, in: .rect(cornerRadius: 26)),

@@ -11,6 +11,8 @@ final class AppModel: NSObject {
     var compact = false
     /// First-run setup is showing in the panel.
     var onboarding = false
+    /// The plan editor is showing in place of the panel.
+    var planEditing = false
     /// True while the panel is shrinking into (or growing out of) the menu bar.
     var dismissing = false
     var panelVisible = true
@@ -94,7 +96,17 @@ final class AppModel: NSObject {
     func replayOnboarding() {
         if engine.phase.isActive { return } // never interrupt a running session
         showPanel()
-        withAnimation(morph) { compact = false; onboarding = true }
+        withAnimation(morph) { compact = false; planEditing = false; onboarding = true }
+    }
+    func openPlanEditor() {
+        guard engine.phase == .ready, !onboarding else { return }
+        settingsOpen = false
+        showPanel()
+        withAnimation(morph) { compact = false; planEditing = true }
+    }
+    func closePlanEditor() {
+        guard planEditing else { return }
+        withAnimation(morph) { planEditing = false }
     }
     static let focusPresets = [15, 25, 45, 60]
     /// The spring used for every panel shape change.
@@ -110,12 +122,13 @@ final class AppModel: NSObject {
         guard !onboarding else { showPanel(); return }
         // Present the popover only once the panel has finished appearing or expanding,
         // otherwise it anchors to a button that is still moving.
-        let settle = !panelVisible || compact || dismissing
+        let settle = !panelVisible || compact || dismissing || planEditing
+        closePlanEditor()
         setCompact(false)
         showPanel()
         if settle {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-                guard let self, panelVisible, !compact, !onboarding else { return }
+                guard let self, panelVisible, !compact, !onboarding, !planEditing else { return }
                 settingsOpen = true
             }
         } else {
@@ -151,6 +164,8 @@ final class AppModel: NSObject {
         switch event {
         case .startFocus, .newSession: announce("Focus started, \(Int(engine.total / 60)) minutes")
         case .startBreak: announce("Break started")
+        case .nextTask: announce("Next task: \(engine.task)")
+        case .extend: announce("\(SessionEngine.extendMinutes) more minutes")
         default: break
         }
     }
@@ -188,13 +203,18 @@ final class AppModel: NSObject {
             case "q": NSApp.terminate(nil)
             case "l":
                 guard engine.phase == .ready else { return event }
-                pendingTaskFocus = compact
+                pendingTaskFocus = compact || planEditing
+                closePlanEditor()
                 setCompact(false); showPanel(); panelController?.panel.makeKey(); taskFocusRequest += 1
             default: return event
             }
             return nil
         }
         guard NSApp.keyWindow === panelController?.panel, !onboarding else { return event }
+        if planEditing {
+            if event.keyCode == 53 { closePlanEditor(); return nil }
+            return event
+        }
         if event.keyCode == 53 {
             if settingsOpen { settingsOpen = false }
             else if case .confirmEnd = engine.phase { act(.keepGoing) }

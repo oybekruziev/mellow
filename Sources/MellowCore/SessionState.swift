@@ -31,6 +31,9 @@ enum SessionPhase: Equatable {
 enum SessionEvent: CaseIterable {
     case startFocus, pause, resume, requestEnd, keepGoing, confirmEnd
     case startBreak, later, endBreak, newSession
+    /// Plan tasks: `finishTask` ends the task early as done, `nextTask` skips the break,
+    /// `extend` gives the task that just ran out a few more minutes.
+    case finishTask, nextTask, extend
 }
 
 enum CompanionType: String, CaseIterable, Identifiable {

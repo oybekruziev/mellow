@@ -32,7 +32,11 @@ struct PanelRootView: View {
         .onChange(of: model.settings.appearance) { model.applyAppearance() }
         .onChange(of: model.settings.keepOnTop) { model.panelController?.panel.level = model.settings.keepOnTop ? .floating : .normal }
         .onChange(of: model.settings.soundOn) { _, on in if on { model.playChime() } }
-        .onChange(of: model.engine.phase) { model.syncMusic() }
+        .onChange(of: model.engine.phase) {
+            model.syncMusic()
+            // The editor only plans ahead; a session started from the menu bar closes it.
+            if model.engine.phase != .ready { model.closePlanEditor() }
+        }
         .onChange(of: model.settings.musicDuringFocus) { if model.engine.phase.isActive { model.syncMusic() } }
         .onChange(of: model.settings.musicVolume) { _, volume in model.music.volume = volume }
     }
@@ -42,6 +46,8 @@ struct PanelRootView: View {
             measured(OnboardingView(model: model))
         } else if model.compact {
             measured(CompactView(model: model, glass: false))
+        } else if model.planEditing {
+            measured(PlanEditorView(model: model))
         } else {
             measured(PanelView(model: model, glass: false))
         }
@@ -217,6 +223,12 @@ struct PanelView: View {
                                 .foregroundStyle(Palette.secondary).allowsHitTesting(false).accessibilityHidden(true)
                         }
                     }
+                Button { model.openPlanEditor() } label: {
+                    IconImage(.list, size: 13).frame(width: 22, height: 22)
+                }
+                .buttonStyle(ToolbarStyle())
+                .help("Plan Several Tasks — a name and time for each")
+                .accessibilityLabel("Plan Several Tasks")
                 Button(action: addToPlan) {
                     IconImage(.plus, size: 12).frame(width: 22, height: 22)
                 }
@@ -233,7 +245,7 @@ struct PanelView: View {
                 .animation(.easeOut(duration: 0.15), value: taskFocused)
                 .help(model.settings.lastTask.isEmpty ? "What are you working on?" : model.settings.lastTask)
             if !model.settings.plan.isEmpty {
-                PlanList(settings: model.settings)
+                PlanList(settings: model.settings) { model.openPlanEditor() }
                     .transition(.opacity.combined(with: .move(edge: .top)))
             }
             HStack(spacing: 10) {
@@ -255,11 +267,16 @@ struct PanelView: View {
         }
     }
 
+    /// A plan task can be marked done before its time is up.
+    private var canFinishTask: Bool { !phase.isBreak && engine.currentPlanIndex != nil }
     private var activeContent: some View {
         Group {
-            HStack(spacing: 10) {
+            HStack(spacing: canFinishTask ? 8 : 10) {
                 timerText
                 Spacer(minLength: 0)
+                if canFinishTask {
+                    CircleButton(icon: .check, title: "Task Done", size: 34, tint: nil) { model.act(.finishTask) }
+                }
                 CircleButton(icon: .stop, title: phase.isBreak ? "End Break" : "End Session", size: 34, tint: nil) { model.endAction() }
                 CircleButton(icon: phase.isRunning ? .pause : .play, title: phase.isRunning ? "Pause" : "Resume", size: 44, tint: tint) {
                     model.primaryAction()
@@ -288,17 +305,33 @@ struct PanelView: View {
     }
 
     private var completeContent: some View {
-        Group {
+        let planTask = engine.currentPlanIndex != nil
+        return Group {
             VStack(alignment: .leading, spacing: 2) {
                 Text(model.settings.companion.completionTitle).font(.system(size: 17, weight: .semibold)).tracking(-0.17)
-                Text(model.settings.companion.completionDetail)
+                Text(planTask ? "Time's up for this task. Need more? Add \(SessionEngine.extendMinutes) minutes."
+                              : model.settings.companion.completionDetail)
                     .font(.system(size: 13)).tracking(-0.065).foregroundStyle(Palette.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
-            HStack(spacing: 8) {
-                PushButton(title: "Later", fill: true) { model.act(.later) }
-                PushButton(title: "\(model.settings.breakMinutes)-min Break", icon: .cup, tint: Palette.rest, fill: true) {
-                    model.act(.startBreak)
+            if planTask {
+                // A plan task: a few more minutes, a break, or straight on to the next one.
+                HStack(spacing: 8) {
+                    PushButton(title: "+\(SessionEngine.extendMinutes) min", fill: true) { model.act(.extend) }
+                    if nextTask != nil {
+                        PushButton(title: "Break", tint: Palette.rest, fill: true) { model.act(.startBreak) }
+                        PushButton(title: "Next", icon: .skip, tint: Palette.focus, fill: true) { model.act(.nextTask) }
+                    } else {
+                        PushButton(title: "Finish", fill: true) { model.act(.later) }
+                        PushButton(title: "Break", tint: Palette.rest, fill: true) { model.act(.startBreak) }
+                    }
+                }
+            } else {
+                HStack(spacing: 8) {
+                    PushButton(title: "Later", fill: true) { model.act(.later) }
+                    PushButton(title: "\(model.settings.breakMinutes)-min Break", icon: .cup, tint: Palette.rest, fill: true) {
+                        model.act(.startBreak)
+                    }
                 }
             }
             todayRow(justCompleted: true)
@@ -319,7 +352,8 @@ struct PanelView: View {
     private var timerText: some View { timerText(color: paused ? Palette.secondary : Palette.primary) }
     private func timerText(color: Color) -> some View {
         Text(engine.formattedTime)
-            .font(.system(size: engine.formattedTime.count > 5 ? 36 : 46, weight: .semibold, design: .rounded))
+            // Long times shrink, more so when a third button (Task Done) shares the row.
+            .font(.system(size: engine.formattedTime.count > 5 ? (canFinishTask ? 31 : 36) : 46, weight: .semibold, design: .rounded))
             .monospacedDigit().tracking(-0.69)
             .foregroundStyle(color)
             .lineLimit(1).fixedSize()

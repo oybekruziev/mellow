@@ -126,3 +126,17 @@ Two review passes, one on window/engine/concurrency and one on SwiftUI/UX/access
   - Compact text shrinks slightly instead of truncating.
   - The off switch has a visible outline in Light.
 - **Verification:** 13 unit tests (2 new), 17 snapshots, and a 150-cycle stress run at 60 ms all pass.
+
+## Multi-task plans (2026-10-03)
+
+- **Plan editor:** opened from the list button in the task field or **Edit** under the plan. It has:
+  - the number of tasks (up to 20);
+  - one length for all tasks and the break between them;
+  - a name and a length for each task. Blank names become "Task N", and Return on the last row adds a task.
+  It edits a draft that is saved with **Save Plan**. Starting a session from the menu bar closes it.
+- **When a task's time is up:**
+  - "Start break" (default) keeps the automatic breaks.
+  - "Let me choose" offers **+5 min** (the same task again, still one flower), **Break** and **Next** (skip the break).
+  Also available as "Start plan breaks automatically" in Settings.
+- **✓ Task Done** during a plan task finishes it early. It counts as done and earns its flower.
+- **Engine:** new `finishTask`, `nextTask` and `extend` events, covered by 3 new tests (16 total). Snapshots `15-plan-choose`, `16-plan-focus-long`, `17-plan-editor` and `18-plan-editor-new`. The stress test now opens the editor, and a run leaves the saved plan untouched.

@@ -110,6 +110,9 @@ struct BehaviorSection: View {
             Toggle("Play sound when done", isOn: $settings.soundOn).toggleStyle(MiniSwitchStyle()).padding(.vertical, 8)
             Palette.separator.frame(height: 0.5)
             Toggle("Keep panel on top", isOn: $settings.keepOnTop).toggleStyle(MiniSwitchStyle()).padding(.vertical, 8)
+            Palette.separator.frame(height: 0.5)
+            Toggle("Start plan breaks automatically", isOn: $settings.planAutoBreak).toggleStyle(MiniSwitchStyle()).padding(.vertical, 8)
+                .help("Off: when a task's time is up, choose Break, Next or a few more minutes")
         }
         .padding(.horizontal, 12)
         .modifier(SectionSurface())

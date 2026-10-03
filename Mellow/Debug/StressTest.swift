@@ -2,7 +2,7 @@
 import AppKit
 
 /// Debug-only: `MELLOW_STRESS=<cycles> Mellow` drives the real panel through compact/expand,
-/// hide/show, settings and session changes, then exits 0. A crash exits non-zero.
+/// hide/show, settings, the plan editor and session changes, then exits 0. A crash exits non-zero.
 @MainActor
 enum StressTest {
     static func runIfRequested(_ model: AppModel) {
@@ -14,7 +14,7 @@ enum StressTest {
             for cycle in 0..<cycles {
                 let fixed = ProcessInfo.processInfo.environment["MELLOW_STRESS_PAUSE"].flatMap(Double.init)
                 let pause = fixed ?? [0.05, 0.2, 0.45, 0.7][cycle % 4]
-                switch cycle % 9 {
+                switch cycle % 10 {
                 case 0: model.act(.startFocus)
                 case 3: model.hidePanel()
                 case 4: model.showPanel()
@@ -22,6 +22,7 @@ enum StressTest {
                 case 6: model.finishOnboarding(); model.openSettings()
                 case 7: model.settingsOpen = false; model.primaryAction()
                 case 8: model.endAction(); model.act(.confirmEnd)
+                case 9: model.openPlanEditor() // the next start closes it
                 default: break
                 }
                 model.toggleCompact()

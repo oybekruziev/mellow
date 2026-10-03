@@ -15,6 +15,9 @@ final class Settings {
     var musicDuringFocus: Bool { didSet { defaults.set(musicDuringFocus, forKey: "musicDuringFocus") } }
     var musicVolume: Double { didSet { defaults.set(musicVolume, forKey: "musicVolume") } }
     var onboarded: Bool { didSet { defaults.set(onboarded, forKey: "onboarded") } }
+    /// In a plan, a break starts by itself when a task's time is up. Off: the user picks
+    /// Break, Next Task or a few more minutes.
+    var planAutoBreak: Bool { didSet { defaults.set(planAutoBreak, forKey: "planAutoBreak") } }
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
@@ -29,6 +32,7 @@ final class Settings {
         musicDuringFocus = defaults.object(forKey: "musicDuringFocus") as? Bool ?? false
         musicVolume = min(1, max(0, defaults.object(forKey: "musicVolume") as? Double ?? 0.6))
         onboarded = defaults.bool(forKey: "onboarded")
+        planAutoBreak = defaults.object(forKey: "planAutoBreak") as? Bool ?? true
     }
 
     // MARK: Plan editing
@@ -46,4 +50,16 @@ final class Settings {
         plan[index].minutes = min(120, max(1, minutes))
     }
     func clearPlan() { plan.removeAll() }
+    /// Replaces the tasks still to do; finished ones stay. Empty titles become "Task N".
+    func setPendingPlan(_ items: [PlanItem]) {
+        let done = plan.filter(\.done)
+        plan = done + items.enumerated().map { offset, item in
+            var item = item
+            let trimmed = item.title.trimmingCharacters(in: .whitespacesAndNewlines)
+            item.title = trimmed.isEmpty ? "Task \(done.count + offset + 1)" : trimmed
+            item.minutes = min(120, max(1, item.minutes))
+            item.done = false
+            return item
+        }
+    }
 }

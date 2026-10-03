@@ -12,7 +12,9 @@ macOS 26+ uchun native SwiftUI fokus taymeri. Figma dizayni va `Mellow-handoff/I
 - Tugallangan fokus bir gul beradi. Tanaffus gul bermaydi.
 - Settings yoki hamroh ustida o‘ng tugma orqali **Plant / Cat / Candle** almashtiriladi.
 - Panelni yashirish yoki ixcham qilish taymerni to‘xtatmaydi. Yashirilganda panel menyu panelidagi gul belgisiga "kirib ketadi".
-- **Reja (to-do):** vazifani yozib **+** bosing, har bir vazifaga o‘z vaqtini bering. Vazifa tugagach break o‘zi boshlanadi, keyingi vazifa **Next Task** bilan boshlanadi.
+- **Reja (to-do):** vazifani yozib **+** bosing, har bir vazifaga o‘z vaqtini bering.
+- **Ko‘p vazifali reja:** maydondagi ro‘yxat tugmasi yoki **Edit** muharririni ochadi. Unda vazifalar soni (20 tagacha), hammasi uchun bitta vaqt, break uzunligi, har bir vazifaning nomi va vaqti beriladi. Nom yozilmasa “Task N” bo‘ladi; oxirgi qatorda Return yangi vazifa qo‘shadi.
+- **Vazifa vaqti tugaganda:** “Start break” rejimida break o‘zi boshlanadi, keyingi vazifa **Next Task** bilan. “Let me choose” rejimida **+5 min**, **Break** yoki **Next** tanlanadi. Fokus paytida **✓** vazifani muddatidan oldin bajarilgan deb belgilaydi.
 - **Lofi musiqa:** pastdagi ♪ tugmasi. Settings’da “Play lofi music during focus” yoqilsa, musiqa fokus bilan birga yonadi va o‘chadi. 13 ta CC0 trek (HoliznaCC0).
 - **Maskotlar:** Plant, Cat, Candle, Fox, Coffee, Moon, Cactus. Fokus paytida 5 kadr sekundiga 5 marta aylanadi, sessiya tugaganda “uyg‘onish” yoki “gullash” animatsiyasi o‘ynaydi.
 
@@ -47,7 +49,7 @@ Panel yoki app faol bo‘lganda: Space — boshlash/pauza/davom, Return — asos
 - `Mellow/Views` — Liquid Glass panel, Figma komponentlari (tugmalar, segment, switch, stepper), Settings va hamroh animatsiyalari.
 - `Mellow/Debug` — faqat Debug build: barcha holatlarni PNG qilib chiqaradi (`MELLOW_SNAPSHOT_DIR`).
 - `Mellow/MenuBar` — native menu bar label va menyu.
-- `Tests/MellowCoreTests` — 11 ta test; holat/event jadvalidagi barcha kombinatsiyalar va reja (to-do) oqimi tekshiriladi.
+- `Tests/MellowCoreTests` — 16 ta test; holat/event jadvalidagi barcha kombinatsiyalar va reja (to-do) oqimi tekshiriladi.
 - `Mellow/Resources/Assets.xcassets` — handoff’dagi asl assetlar va Light/Dark rang tokenlari.
 
 - `Mellow/Music` — lofi pleyer, `Mellow/Resources/Music` — treklar.
