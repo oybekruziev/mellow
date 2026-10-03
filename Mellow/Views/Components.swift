@@ -13,7 +13,10 @@ enum Palette {
     static let track = Color("progressTrack")
 
     // Translucent fills from the Figma glass layers. Dark values keep the same hierarchy over a dark backdrop.
-    static let panelWash = Color(light: .white.withAlphaComponent(0.30), dark: .white.withAlphaComponent(0.03))
+    // Liquid Glass takes its tone from whatever is behind it, so on its own it turns light over a
+    // white window and dark over a black one. The wash pins the glass to the app's appearance,
+    // keeping the labels readable on any backdrop.
+    static let panelWash = Color(light: .white.withAlphaComponent(0.74), dark: .black.withAlphaComponent(0.68))
     static let panelEdge = Color(light: .white.withAlphaComponent(0.65), dark: .white.withAlphaComponent(0.15))
     static let control = Color(light: .white.withAlphaComponent(0.75), dark: .white.withAlphaComponent(0.13))
     static let controlEdge = Color(light: .white.withAlphaComponent(0.70), dark: .white.withAlphaComponent(0.12))

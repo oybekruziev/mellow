@@ -28,7 +28,13 @@ open Build/Mellow.app
 zsh scripts/test.sh
 ```
 
-Build script mahalliy foydalanish uchun ad-hoc imzoli universal app yaratadi. App Store yoki tashqi tarqatish uchun Apple Developer signing va notarization alohida sozlanadi.
+Boshqa Mac'larga tarqatish uchun notarizatsiyalangan DMG:
+
+```sh
+zsh scripts/release.sh
+```
+
+U Developer ID (Oybek Ruziev, 79CTV95T7T) bilan imzolaydi, Xcode'dagi Apple akkaunti orqali Apple'ga notarizatsiyaga yuboradi, tasdiqni ilovaga biriktiradi (staple) va `Build/Mellow-<version>.dmg` ni yaratadi. Notarizatsiyasiz mahalliy DMG: `zsh scripts/make_dmg.sh`.
 
 ## Qisqa tugmalar
 
