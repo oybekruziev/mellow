@@ -1,8 +1,11 @@
 #!/bin/zsh
 # Notarized release: archive → Developer ID export uploaded to Apple's notary service
 # (through the Apple account signed in to Xcode, no password needed) → stapled app → DMG.
-#   zsh scripts/release.sh
+#   zsh scripts/release.sh            # notarized DMG in Build/
+#   zsh scripts/release.sh --publish  # …and put it behind bemellow.cc's Download button
 set -eu
+publish=false
+[[ ${1:-} == --publish ]] && publish=true
 cd "${0:A:h:h}"
 team=${TEAM_ID:-79CTV95T7T}
 work=/private/tmp/mellow-release
@@ -36,3 +39,5 @@ mkdir -p Build
 if [[ -d Build/Mellow.app ]]; then rm -rf Build/Mellow.app; fi
 ditto --norsrc --noextattr "$work/notarized/Mellow.app" Build/Mellow.app
 zsh scripts/make_dmg.sh --skip-build
+# Uses this Mac's wrangler login, so no Cloudflare token has to live on GitHub.
+if $publish; then zsh scripts/publish.sh; fi

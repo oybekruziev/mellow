@@ -1,11 +1,10 @@
-# When a GitHub Release is published with a notarized DMG attached, put that DMG
-# behind the website's Download button (download.bemellow.cc/Mellow.dmg).
+# Puts a release's notarized DMG behind the website's Download button
+# (download.bemellow.cc/Mellow.dmg). Run by hand from the Actions tab.
 # Needs the repository secret CLOUDFLARE_API_TOKEN (Account → Workers R2 Storage → Edit).
+# The usual path needs no token: `zsh scripts/release.sh --publish` uploads from the Mac.
 name: Publish DMG
 
 on:
-  release:
-    types: [published]
   workflow_dispatch:
     inputs:
       tag:
