@@ -64,3 +64,30 @@ Checked and left as is:
 - The thin vertical ticks at the ends of capsule strokes in `Build/Screenshots` come from AppKit's `cacheDisplay` rasterizer used by the snapshot tool. The same views rendered with SwiftUI's `ImageRenderer` have no ticks; the live app is unaffected.
 
 Still to verify on device: the morph, the menu bar tuck animation, single-click expand, and the Mellow menu bar icon (it may be hidden behind the notch when the menu bar is full).
+
+## Crash fix — compact ↔ panel (2026-10-03)
+
+- **Symptom:** the app quit while switching between the compact capsule and the full panel.
+- **Cause:** `NSGenericException` — "more Update Constraints in Window passes than there are views". Two things resized the window at once:
+  - the NSHostingView, as the window's content view, animated the window size itself (`updateAnimatedWindowSize`);
+  - `resize(contentSize:)` set the frame from inside SwiftUI's layout pass.
+- **Fix:**
+  - the hosting view now sits in a plain container view, so SwiftUI no longer resizes the window;
+  - window size changes are applied on the next run-loop turn and coalesced.
+- **Verification:** new Debug-only stress test, `MELLOW_STRESS=<cycles> [MELLOW_STRESS_PAUSE=<s>]`. It drives the real panel through compact/expand, hide/show, settings and session changes.
+  - Before the fix it crashed within 60 cycles.
+  - After the fix: 3 × 120 cycles at mixed speeds, plus 150 cycles each at 20 ms, 120 ms and 300 ms. All exited cleanly, with no console warnings.
+
+## Smooth morphing and onboarding (2026-10-03)
+
+- The panel window is now a fixed transparent canvas, and one shared glass background springs between sizes (spring 0.5 s, bounce 0.14). This covers panel ↔ compact, onboarding pages and taller or shorter states. Content is masked to the glass, so nothing is cut off or spills outside while it moves. Content blurs in after the glass starts moving and leaves quickly.
+- Outside the glass, clicks pass through to the apps behind: `ignoresMouseEvents` follows the pointer, using global and local mouse-moved monitors.
+- Hide/show into the menu bar now adds a blur and uses springier timing.
+- First-run onboarding has 4 steps:
+  1. welcome, with the author's social icons (Instagram, X, LinkedIn, Threads, YouTube);
+  2. companion;
+  3. focus and break length, sound, keep on top;
+  4. lofi music with a preview, and appearance.
+  Settings shares the same section views; "Show Welcome Again" reopens it.
+- Snapshots `13-onboarding-1…4.png`.
+- Stress: 150 cycles each at 20 ms, 150 ms and 500 ms, now including onboarding open/close. All clean. The stress run restores the real `onboarded` flag afterwards.

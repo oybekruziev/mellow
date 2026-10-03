@@ -6,6 +6,7 @@ macOS 26+ uchun native SwiftUI fokus taymeri. Figma dizayni va `Mellow-handoff/I
 
 `Build/Mellow.app` faylini ikki marta bosing. Mellow Dock’da ko‘rinmaydi: u menyu panelidagi gul belgisi va suzuvchi panel orqali ishlaydi.
 
+- Birinchi ochilishda **onboarding** chiqadi: maskot, fokus va break vaqti, ovoz, lofi musiqa va mavzu tanlanadi. Settings → “Show Welcome Again” orqali qayta ochiladi.
 - Vazifani yozing va **Start Focus** bosing.
 - **15 / 25 / 45 min** yoki Settings’da **1–120 min** tanlang.
 - Tugallangan fokus bir gul beradi. Tanaffus gul bermaydi.

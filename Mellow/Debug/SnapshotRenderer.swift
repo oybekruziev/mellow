@@ -65,6 +65,16 @@ enum SnapshotRenderer {
             }
         }
         render(grid.padding(12).background(.white), to: url.appending(path: "12-mascots.png"), dark: false)
+        // Onboarding pages.
+        let defaults = UserDefaults(suiteName: suite)!
+        defaults.removePersistentDomain(forName: suite)
+        let settings = Settings(defaults: defaults)
+        settings.companion = .fox
+        let model = AppModel(settings: settings, engine: SessionEngine(settings: settings, stats: DailyStats(defaults: defaults)))
+        for step in 0..<4 {
+            render(OnboardingView(model: model, step: step).background { GlassBackground() },
+                   to: url.appending(path: "13-onboarding-\(step + 1).png"), dark: dark)
+        }
         UserDefaults.standard.removePersistentDomain(forName: suite)
         return true
     }

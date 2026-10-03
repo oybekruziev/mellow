@@ -9,6 +9,8 @@ final class AppModel: NSObject {
     let engine: SessionEngine
     let music: MusicPlayer
     var compact = false
+    /// First-run setup is showing in the panel.
+    var onboarding = false
     /// True while the panel is shrinking into (or growing out of) the menu bar.
     var dismissing = false
     var panelVisible = true
@@ -30,6 +32,7 @@ final class AppModel: NSObject {
     }
     func start() {
         guard panelController == nil else { return }
+        onboarding = !settings.onboarded
         panelController = PanelController(model: self)
         applyAppearance()
         engine.onCompletion = { [weak self] isBreak in
@@ -57,11 +60,27 @@ final class AppModel: NSObject {
     func showPanel() { panelVisible = true; panelController?.show() }
     func hidePanel() { settingsOpen = false; panelVisible = false; panelController?.hide() }
     func togglePanel() { panelVisible ? hidePanel() : showPanel() }
-    func toggleCompact() { settingsOpen = false; setCompact(!compact); showPanel() }
+    func toggleCompact() {
+        guard !onboarding else { return }
+        settingsOpen = false; setCompact(!compact); showPanel()
+    }
+    func finishOnboarding() {
+        settings.onboarded = true
+        if music.isPlaying && !settings.musicDuringFocus { music.pause() }
+        withAnimation(morph) { onboarding = false }
+    }
+    func replayOnboarding() {
+        if engine.phase.isActive { return } // never interrupt a running session
+        showPanel()
+        withAnimation(morph) { compact = false; onboarding = true }
+    }
+    /// The spring used for every panel shape change.
+    var morph: Animation {
+        NSWorkspace.shared.accessibilityDisplayShouldReduceMotion ? .easeInOut(duration: 0.2) : .spring(duration: 0.5, bounce: 0.14)
+    }
     func setCompact(_ value: Bool) {
         guard compact != value else { return }
-        let reduceMotion = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
-        withAnimation(reduceMotion ? .easeInOut(duration: 0.15) : .spring(response: 0.42, dampingFraction: 0.82)) { compact = value }
+        withAnimation(morph) { compact = value }
     }
     func openSettings() {
         // Present the popover only once the panel has finished appearing or expanding,
@@ -98,6 +117,7 @@ final class AppModel: NSObject {
         else if engine.send(.requestEnd) { setCompact(false); showPanel() }
     }
     func act(_ event: SessionEvent) {
+        if onboarding && event == .startFocus { finishOnboarding() }
         guard engine.send(event) else { return }
         switch event {
         case .startFocus, .newSession: announce("Focus started, \(Int(engine.total / 60)) minutes")
@@ -144,7 +164,7 @@ final class AppModel: NSObject {
             }
             return nil
         }
-        guard NSApp.keyWindow === panelController?.panel else { return event }
+        guard NSApp.keyWindow === panelController?.panel, !onboarding else { return event }
         if event.keyCode == 53 {
             if settingsOpen { settingsOpen = false }
             else if case .confirmEnd = engine.phase { act(.keepGoing) }

@@ -36,7 +36,7 @@ extension Color {
 
 enum Icon: String {
     case settings, compact, hide, play, pause, stop, check, cup, close, minus, plus
-    case music, skip, expand, instagram, linkedin, x, threads, globe, mail
+    case music, skip, expand, instagram, linkedin, x, threads, youtube, globe, mail
 }
 
 struct IconImage: View {
@@ -51,18 +51,12 @@ struct IconImage: View {
 
 // MARK: - Surfaces
 
+/// Standalone glass (snapshots, previews). The live panel draws one shared GlassBackground
+/// in PanelRootView so it can morph between the panel, the capsule and onboarding.
 struct GlassSurface: ViewModifier {
     var radius: CGFloat = 26
-    /// Shared by the panel and the compact capsule so the glass morphs between them.
-    var namespace: Namespace.ID? = nil
     func body(content: Content) -> some View {
-        content.background {
-            if let namespace {
-                GlassBackground(radius: radius).matchedGeometryEffect(id: "glass", in: namespace)
-            } else {
-                GlassBackground(radius: radius)
-            }
-        }
+        content.background { GlassBackground(radius: radius) }
     }
 }
 

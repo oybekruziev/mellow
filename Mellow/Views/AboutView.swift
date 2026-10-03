@@ -1,18 +1,61 @@
 import SwiftUI
 
-/// The author of Mellow. Fill in the links; empty ones are hidden.
+/// The author of Mellow. Paste a profile link into `url` (with or without https://);
+/// until then the icon stays visible but inactive.
 enum Creator {
     static let name = "Oybek Ruziev"
     static let links: [(icon: Icon, title: String, url: String)] = [
         (.instagram, "Instagram", ""),
         (.x, "X (Twitter)", ""),
-        (.threads, "Threads", ""),
         (.linkedin, "LinkedIn", ""),
-        (.globe, "Website", ""),
+        (.threads, "Threads", ""),
+        (.youtube, "YouTube", ""),
     ]
+    static func url(_ text: String) -> URL? {
+        let text = text.trimmingCharacters(in: .whitespaces)
+        guard !text.isEmpty else { return nil }
+        return URL(string: text.contains("://") ? text : "https://\(text)")
+    }
+}
+
+/// Round social buttons for the author's profiles.
+struct SocialLinks: View {
+    var size: CGFloat = 30
+    var body: some View {
+        HStack(spacing: 6) {
+            ForEach(Creator.links, id: \.title) { link in
+                let destination = Creator.url(link.url)
+                let icon = IconImage(link.icon, size: size * 0.5)
+                    .frame(width: size, height: size)
+                    .background(Palette.control, in: Circle())
+                    .overlay { Circle().strokeBorder(Palette.controlEdge, lineWidth: 0.5) }
+                Group {
+                    if let destination {
+                        Link(destination: destination) { icon }.buttonStyle(PressableStyle())
+                    } else {
+                        icon.opacity(0.55)
+                    }
+                }
+                .foregroundStyle(Palette.primary)
+                .help(destination == nil ? "\(link.title) — coming soon" : link.title)
+                .accessibilityLabel(link.title)
+            }
+        }
+    }
+}
+
+/// Subtle press feedback for icon links.
+struct PressableStyle: ButtonStyle {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed && !reduceMotion ? 0.92 : 1)
+            .animation(.snappy(duration: 0.18), value: configuration.isPressed)
+    }
 }
 
 struct MadeBySection: View {
+    var onReplayWelcome: (() -> Void)? = nil
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 6) {
@@ -22,28 +65,14 @@ struct MadeBySection: View {
                 Text("Free · v\(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0")")
                     .font(.system(size: 11)).foregroundStyle(Palette.secondary)
             }
-            let links = Creator.links.compactMap { link -> (Icon, String, URL)? in
-                let text = link.url.trimmingCharacters(in: .whitespaces)
-                guard !text.isEmpty else { return nil }
-                // Accept "instagram.com/name" as well as full URLs.
-                return URL(string: text.contains("://") ? text : "https://\(text)").map { (link.icon, link.title, $0) }
-            }
-            if !links.isEmpty {
-                HStack(spacing: 6) {
-                    ForEach(links, id: \.1) { icon, title, url in
-                        Link(destination: url) {
-                            IconImage(icon, size: 15).frame(width: 30, height: 30)
-                                .background(Palette.control, in: Circle())
-                                .overlay { Circle().strokeBorder(Palette.controlEdge, lineWidth: 0.5) }
-                        }
-                        .buttonStyle(.plain).foregroundStyle(Palette.primary)
-                        .help(title).accessibilityLabel(title)
-                    }
-                }
-            }
+            SocialLinks()
             Text("Mellow is free. Music: “Public Domain Lofi” by HoliznaCC0 (CC0). Icons: Lucide (ISC).")
                 .font(.system(size: 11)).foregroundStyle(Palette.secondary)
                 .fixedSize(horizontal: false, vertical: true)
+            if let onReplayWelcome {
+                Button("Show Welcome Again", action: onReplayWelcome)
+                    .buttonStyle(.plain).font(.system(size: 11, weight: .medium)).foregroundStyle(Palette.focus)
+            }
         }
         .padding(.horizontal, 12).padding(.vertical, 10)
         .modifier(SectionSurface())

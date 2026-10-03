@@ -2,24 +2,28 @@ import SwiftUI
 
 struct PanelRootView: View {
     @Bindable var model: AppModel
-    @Namespace private var glass
+    /// Size of the glass. It follows the content with a spring, so every change of shape —
+    /// panel ↔ capsule, onboarding pages, a taller state — morphs instead of jumping.
+    @State private var glassSize: CGSize = .zero
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     var body: some View {
         ZStack(alignment: .topTrailing) {
-            if model.compact {
-                CompactView(model: model, glass: glass).transition(contentTransition)
-            } else {
-                PanelView(model: model, glass: glass).transition(contentTransition)
+            if glassSize != .zero {
+                GlassBackground().frame(width: glassSize.width, height: glassSize.height)
             }
+            ZStack(alignment: .topTrailing) { content }
+                // Content never shows outside the glass while the glass is still growing or shrinking.
+                .mask(alignment: .topTrailing) {
+                    RoundedRectangle(cornerRadius: 26, style: .continuous)
+                        .frame(width: glassSize.width, height: glassSize.height)
+                }
         }
-        .scaleEffect(model.dismissing ? 0.12 : 1, anchor: .top)
+        .scaleEffect(model.dismissing ? 0.2 : 1, anchor: .top)
         .opacity(model.dismissing ? 0 : 1)
-        .fixedSize(horizontal: true, vertical: true)
-        .onGeometryChange(for: CGSize.self) { $0.size } action: { size in
-            model.panelController?.resize(contentSize: size)
-        }
+        .blur(radius: model.dismissing && !reduceMotion ? 8 : 0)
         .padding(PanelController.shadowInset)
-        // The window can be larger than the content while it morphs; keep the content pinned top-right.
+        // The window is a fixed canvas; the panel lives in its top-right corner.
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
         .foregroundStyle(Palette.primary)
         .tint(Palette.focus)
@@ -30,16 +34,44 @@ struct PanelRootView: View {
         .onChange(of: model.settings.musicDuringFocus) { model.syncMusic() }
         .onChange(of: model.settings.musicVolume) { _, volume in model.music.volume = volume }
     }
+
+    @ViewBuilder private var content: some View {
+        if model.onboarding {
+            measured(OnboardingView(model: model))
+        } else if model.compact {
+            measured(CompactView(model: model, glass: false))
+        } else {
+            measured(PanelView(model: model, glass: false))
+        }
+    }
+
+    private func measured(_ view: some View) -> some View {
+        view
+            .fixedSize()
+            .onGeometryChange(for: CGSize.self) { $0.size } action: { size in
+                model.panelController?.contentSizeChanged(size)
+                if glassSize == .zero || reduceMotion {
+                    glassSize = size
+                } else {
+                    withAnimation(.spring(duration: 0.5, bounce: 0.14)) { glassSize = size }
+                }
+            }
+            .transition(contentTransition)
+    }
+
+    /// New content blurs in slightly after the glass starts moving; old content leaves quickly.
     private var contentTransition: AnyTransition {
         reduceMotion ? .opacity : .asymmetric(
-            insertion: .opacity.animation(.easeOut(duration: 0.2).delay(0.12)),
-            removal: .opacity.animation(.easeIn(duration: 0.1)))
+            insertion: AnyTransition(.blurReplace).combined(with: .scale(scale: 0.96, anchor: .topTrailing))
+                .animation(.smooth(duration: 0.32).delay(0.08)),
+            removal: AnyTransition(.blurReplace).animation(.easeOut(duration: 0.14)))
     }
 }
 
 struct PanelView: View {
     @Bindable var model: AppModel
-    var glass: Namespace.ID? = nil
+    /// False inside the live panel, where PanelRootView draws one shared glass.
+    var glass = true
     @FocusState private var taskFocused: Bool
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     private var engine: SessionEngine { model.engine }
@@ -60,8 +92,8 @@ struct PanelView: View {
         }
         .padding(.horizontal, 14).padding(.top, 12).padding(.bottom, 14)
         .frame(width: 300, alignment: .leading)
-        .modifier(GlassSurface(namespace: glass))
-        .animation(reduceMotion ? nil : .easeInOut(duration: 0.3), value: phase.isBreak)
+        .background { if glass { GlassBackground() } }
+        .animation(reduceMotion ? nil : .smooth(duration: 0.35), value: phase)
         .onChange(of: model.taskFocusRequest) { taskFocused = true }
     }
 
@@ -289,7 +321,7 @@ struct PanelView: View {
 
 struct CompactView: View {
     @Bindable var model: AppModel
-    var glass: Namespace.ID? = nil
+    var glass = true
     private var phase: SessionPhase { model.engine.phase }
     private var caption: String {
         switch phase {
@@ -345,7 +377,7 @@ struct CompactView: View {
         }
         .padding(.leading, 8).padding(.trailing, 9)
         .frame(width: 168, height: 52)
-        .modifier(GlassSurface(namespace: glass))
+        .background { if glass { GlassBackground() } }
         .contextMenu { CompanionMenu(model: model, compact: true) }
     }
 }

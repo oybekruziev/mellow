@@ -14,6 +14,7 @@ final class Settings {
     var plan: [PlanItem] { didSet { defaults.set(try? JSONEncoder().encode(plan), forKey: "plan") } }
     var musicDuringFocus: Bool { didSet { defaults.set(musicDuringFocus, forKey: "musicDuringFocus") } }
     var musicVolume: Double { didSet { defaults.set(musicVolume, forKey: "musicVolume") } }
+    var onboarded: Bool { didSet { defaults.set(onboarded, forKey: "onboarded") } }
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
@@ -27,6 +28,7 @@ final class Settings {
         plan = defaults.data(forKey: "plan").flatMap { try? JSONDecoder().decode([PlanItem].self, from: $0) } ?? []
         musicDuringFocus = defaults.object(forKey: "musicDuringFocus") as? Bool ?? false
         musicVolume = min(1, max(0, defaults.object(forKey: "musicVolume") as? Double ?? 0.6))
+        onboarded = defaults.bool(forKey: "onboarded")
     }
 
     // MARK: Plan editing

@@ -24,6 +24,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if SnapshotRenderer.runIfRequested() { exit(0) }
         #endif
         AppModel.shared.start()
+        #if DEBUG
+        StressTest.runIfRequested(AppModel.shared)
+        #endif
     }
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
         guard AppModel.shared.engine.phase.isActive else { return .terminateNow }
