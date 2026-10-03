@@ -79,11 +79,20 @@ enum SnapshotRenderer {
         return true
     }
 
+    /// MELLOW_SNAPSHOT_BG=white|black puts the panel on a flat backdrop to check contrast.
+    private static func backdrop(dark: Bool) -> AnyView {
+        switch ProcessInfo.processInfo.environment["MELLOW_SNAPSHOT_BG"] {
+        case "white": AnyView(Color.white)
+        case "black": AnyView(Color.black)
+        default: AnyView(LinearGradient(colors: dark ? [.indigo.opacity(0.6), .black] : [.gray.opacity(0.55), .gray.opacity(0.4)],
+                                        startPoint: .topLeading, endPoint: .bottomTrailing))
+        }
+    }
+
     private static func render(_ view: some View, to url: URL, dark: Bool) {
         let content = view
             .padding(32)
-            .background(LinearGradient(colors: dark ? [.indigo.opacity(0.6), .black] : [.gray.opacity(0.55), .gray.opacity(0.4)],
-                                       startPoint: .topLeading, endPoint: .bottomTrailing))
+            .background(backdrop(dark: dark))
             .environment(\.colorScheme, dark ? .dark : .light)
             .foregroundStyle(Palette.primary)
         let host = NSHostingView(rootView: content)
