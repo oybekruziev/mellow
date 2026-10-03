@@ -1,0 +1,11 @@
+// Deploys the landing page to bemellow.cc as a Cloudflare Worker with static assets.
+//   cd website && npx wrangler deploy
+{
+  "name": "mellow-website",
+  "compatibility_date": "2026-10-01",
+  "assets": { "directory": "." },
+  "routes": [
+    { "pattern": "bemellow.cc", "custom_domain": true },
+    { "pattern": "www.bemellow.cc", "custom_domain": true }
+  ]
+}

@@ -23,3 +23,15 @@ setInterval(() => {
   remaining = remaining > 0 ? remaining - 1 : SESSION;
   timeEls.forEach((el) => { el.textContent = fmt(remaining); });
 }, 1000);
+
+// Show the published version next to the Download buttons (scripts/publish.sh writes latest.json).
+// The buttons link straight to Mellow.dmg, so they work without this.
+fetch('https://download.bemellow.cc/latest.json', { cache: 'no-cache' })
+  .then((res) => (res.ok ? res.json() : Promise.reject(res.status)))
+  .then(({ version }) => {
+    if (!version) return;
+    document.querySelectorAll('[data-version]').forEach((el) => {
+      el.textContent = `Version ${version} · For macOS 26 Tahoe and later`;
+    });
+  })
+  .catch(() => {});

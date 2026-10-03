@@ -1,0 +1,54 @@
+# When a GitHub Release is published with a notarized DMG attached, put that DMG
+# behind the website's Download button (download.bemellow.cc/Mellow.dmg).
+# Needs the repository secret CLOUDFLARE_API_TOKEN (Account → Workers R2 Storage → Edit).
+name: Publish DMG
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to publish (e.g. v1.1)
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-dmg
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.event_name == 'workflow_dispatch' || !github.event.release.prerelease
+    # macOS so publish.sh can check the app is notarized before it goes live.
+    runs-on: macos-latest
+    timeout-minutes: 20
+    env:
+      TAG: ${{ github.event.release.tag_name || inputs.tag }}
+      GH_TOKEN: ${{ github.token }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: 325c99c8470fad72497137c33d95d4c4
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download the DMG from the release
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+            echo "::error::Add the CLOUDFLARE_API_TOKEN repository secret first."
+            exit 1
+          fi
+          version="${TAG#v}"
+          mkdir -p "$RUNNER_TEMP/release"
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern '*.dmg' --dir "$RUNNER_TEMP/release"
+          count=$(ls "$RUNNER_TEMP/release"/*.dmg | wc -l | tr -d ' ')
+          if [ "$count" != 1 ]; then
+            echo "::error::Release $TAG must have exactly one .dmg attached (found $count)."
+            exit 1
+          fi
+          mv "$RUNNER_TEMP/release"/*.dmg "$RUNNER_TEMP/Mellow-$version.dmg"
+          echo "DMG=$RUNNER_TEMP/Mellow-$version.dmg" >> "$GITHUB_ENV"
+
+      - name: Publish to download.bemellow.cc
+        run: zsh scripts/publish.sh "$DMG"
