@@ -83,6 +83,22 @@ enum SnapshotRenderer {
             }
         }
         render(grid.padding(12).background(.white), to: url.appending(path: "12-mascots.png"), dark: false)
+        // Motion filmstrip: a poke hop over 0.8 s, then asleep, resting, and the petal burst.
+        let base = Date(timeIntervalSinceReferenceDate: 800_000_003)
+        let motion = VStack(alignment: .leading, spacing: 4) {
+            ForEach(CompanionType.allCases) { type in
+                HStack(spacing: 2) {
+                    Text(type.title).font(.system(size: 11)).frame(width: 50, alignment: .leading)
+                    ForEach(0..<6, id: \.self) { i in
+                        motionFrame(type, .working, MascotEvents(poke: base), base.addingTimeInterval(Double(i) * 0.14))
+                    }
+                    motionFrame(type, .sleeping, MascotEvents(), base.addingTimeInterval(1))
+                    motionFrame(type, .working, MascotEvents(), base.addingTimeInterval(2.3))
+                    motionFrame(type, .resting, MascotEvents(completed: base), base.addingTimeInterval(0.5))
+                }
+            }
+        }
+        render(motion.padding(12).background(.white), to: url.appending(path: "19-motion.png"), dark: false)
         // Onboarding pages.
         let defaults = UserDefaults(suiteName: suite)!
         defaults.removePersistentDomain(forName: suite)
@@ -95,6 +111,18 @@ enum SnapshotRenderer {
         }
         UserDefaults.standard.removePersistentDomain(forName: suite)
         return true
+    }
+
+    private static func motionFrame(_ type: CompanionType, _ mood: MascotMood, _ events: MascotEvents, _ date: Date) -> some View {
+        let size: CGFloat = 46
+        let pose = MascotMotion.pose(type, mood: mood, events: events, at: date, size: size)
+        return Image(String(format: "%@-loop-01", type.rawValue)).resizable().scaledToFit().frame(width: size, height: size)
+            .scaleEffect(x: pose.scaleX, y: pose.scaleY, anchor: .bottom)
+            .rotationEffect(.degrees(pose.angle), anchor: .bottom)
+            .offset(x: pose.dx, y: pose.dy)
+            .background { Canvas { c, s in MascotMotion.drawBack(&c, canvas: s, type: type, mood: mood, at: date, size: size) }.frame(width: 92, height: 92) }
+            .overlay { Canvas { c, s in MascotMotion.drawFront(&c, canvas: s, type: type, mood: mood, events: events, at: date, size: size) }.frame(width: 92, height: 92) }
+            .frame(width: 70, height: 84)
     }
 
     /// MELLOW_SNAPSHOT_BG=white|black puts the panel on a flat backdrop to check contrast.
