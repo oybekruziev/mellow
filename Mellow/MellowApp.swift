@@ -29,7 +29,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         #endif
     }
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
-        guard AppModel.shared.engine.phase.isActive else { return .terminateNow }
+        guard AppModel.shared.engine.phase.isActive, !AppModel.shared.relaunching else { return .terminateNow }
         let alert = NSAlert()
         alert.messageText = "Quit Mellow?"
         alert.informativeText = "This session will end without a flower."

@@ -140,3 +140,10 @@ Two review passes, one on window/engine/concurrency and one on SwiftUI/UX/access
   Also available as "Start plan breaks automatically" in Settings.
 - **✓ Task Done** during a plan task finishes it early. It counts as done and earns its flower.
 - **Engine:** new `finishTask`, `nextTask` and `extend` events, covered by 3 new tests (16 total). Snapshots `15-plan-choose`, `16-plan-focus-long`, `17-plan-editor` and `18-plan-editor-new`. The stress test now opens the editor, and a run leaves the saved plan untouched.
+
+## In-app updates (2026-10-04, version 1.1)
+
+- **Updater** (`Mellow/Update/Updater.swift`, no third-party framework): it reads GitHub's `releases/latest` 5 s after launch and then daily. If it finds a newer tag with a `.dmg` attached, it offers **Install and Relaunch / Later / Release Notes** and a "Skip this version" option. While a session runs, the update only shows in the menu. **Check for Updates…** is in the menu bar menu and in Settings.
+- **Install:** download → mount → check the bundle ID and version → `codesign --verify --deep --strict -R` with the team `79CTV95T7T` requirement → `spctl --assess` → copy next to the running app → swap with `replaceItemAt` → relaunch once the old process exits. If the folder is not writable, the disk image opens in Finder instead.
+- **End-to-end test:** an ad-hoc Debug build posing as 0.9, run from a scratch folder against the real GitHub feed, found v1.0. It downloaded the release DMG, verified it, replaced itself and relaunched. Afterwards the bundle was Notarized Developer ID, with no leftover staging files or mounted images. Debug-only hooks: `MELLOW_UPDATE_FEED`, `MELLOW_UPDATE_CURRENT`, `MELLOW_UPDATE_AUTOINSTALL`.
+- 16 tests pass and the stress run is clean.

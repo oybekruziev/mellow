@@ -44,6 +44,8 @@ Yangi versiyani chiqarish: `MARKETING_VERSION` ni oshiring va `zsh scripts/relea
 gh release create v1.1 Build/Mellow-1.1.dmg --title "Mellow 1.1" --generate-notes
 ```
 
+**Ilova ichidagi yangilanish:** Mellow ishga tushgandan 5 soniya keyin va keyin kuniga bir marta GitHub'dagi eng oxirgi Release'ni tekshiradi (`releases/latest`; tag `v1.2` → versiya `1.2`, biriktirilgan `.dmg` → yangilanish). Yangi versiya topilsa, "Mellow 1.2 is available" oynasi chiqadi: **Install and Relaunch**, **Later**, **Release Notes** va "Skip this version". Sessiya ketayotgan bo'lsa, oyna chiqmaydi — faqat menyuda "Update to Mellow 1.2…" paydo bo'ladi. Menyudagi **Check for Updates…** va Settings'dagi **Check for Updates** darhol tekshiradi. O'rnatishdan oldin yuklangan ilova Developer ID (79CTV95T7T) imzosi va Gatekeeper'dan o'tishi shart. Ilova o'zini almashtira olmasa (masalan, yozib bo'lmaydigan papkada bo'lsa), DMG Finder'da ochiladi. Shuning uchun har bir Release'ga bitta notarizatsiyalangan `.dmg` biriktiring va tag'ni `v<MARKETING_VERSION>` qilib qo'ying. Draft va pre-release'lar e'tiborga olinmaydi.
+
 Brauzerda fayl `Mellow-<version>.dmg` nomi bilan saqlanadi. Tayyor DMG'ni alohida yuklash: `zsh scripts/publish.sh`. Zaxira yo'l: `.github/workflows/publish-dmg.yml` ni Actions'dan qo'lda ishga tushirish — buning uchun repo'da `CLOUDFLARE_API_TOKEN` secret'i (Workers R2 Storage: Edit) kerak.
 
 Sayt (`website/`) `bemellow.cc` da Cloudflare Worker sifatida turadi. O'zgarishdan keyin:

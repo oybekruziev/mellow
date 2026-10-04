@@ -27,7 +27,9 @@ struct SettingsView: View {
             AppearanceSection(settings: model.settings)
             Text("New lengths apply from your next session.")
                 .font(.system(size: 12)).foregroundStyle(Palette.secondary)
-            MadeBySection(replayDisabled: model.engine.phase.isActive) { model.settingsOpen = false; model.replayOnboarding() }
+            MadeBySection(replayDisabled: model.engine.phase.isActive,
+                          onReplayWelcome: { model.settingsOpen = false; model.replayOnboarding() },
+                          onCheckForUpdates: { model.checkForUpdates() })
         }
         .font(.system(size: 13)).foregroundStyle(Palette.primary)
         .padding(.horizontal, 14).padding(.top, 12).padding(.bottom, 16)

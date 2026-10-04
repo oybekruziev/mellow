@@ -58,6 +58,7 @@ struct MadeBySection: View {
     /// The welcome can't replay over a running session.
     var replayDisabled = false
     var onReplayWelcome: (() -> Void)? = nil
+    var onCheckForUpdates: (() -> Void)? = nil
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 6) {
@@ -71,11 +72,18 @@ struct MadeBySection: View {
             Text("Mellow is free. Music: “Public Domain Lofi” by HoliznaCC0 (CC0). Icons: Lucide (ISC).")
                 .font(.system(size: 11)).foregroundStyle(Palette.secondary)
                 .fixedSize(horizontal: false, vertical: true)
-            if let onReplayWelcome {
-                Button("Show Welcome Again", action: onReplayWelcome)
-                    .buttonStyle(.plain).font(.system(size: 11, weight: .medium)).foregroundStyle(Palette.focus)
-                    .disabled(replayDisabled).opacity(replayDisabled ? 0.45 : 1)
-                    .help(replayDisabled ? "Available when no session is running" : "Show the first-run setup again")
+            HStack(spacing: 14) {
+                if let onReplayWelcome {
+                    Button("Show Welcome Again", action: onReplayWelcome)
+                        .buttonStyle(.plain).font(.system(size: 11, weight: .medium)).foregroundStyle(Palette.focus)
+                        .disabled(replayDisabled).opacity(replayDisabled ? 0.45 : 1)
+                        .help(replayDisabled ? "Available when no session is running" : "Show the first-run setup again")
+                }
+                if let onCheckForUpdates {
+                    Button("Check for Updates", action: onCheckForUpdates)
+                        .buttonStyle(.plain).font(.system(size: 11, weight: .medium)).foregroundStyle(Palette.focus)
+                        .help("See if a newer Mellow is out")
+                }
             }
         }
         .padding(.horizontal, 12).padding(.vertical, 10)

@@ -38,6 +38,8 @@ struct MenuBarMenu: View {
             visibilityButton
         }
         Divider()
+        updateItem
+        Divider()
         Button(model.settings.pendingPlan.isEmpty ? "Plan Tasks…" : "Edit Plan…") { model.openPlanEditor() }
             .keyboardShortcut("p")
             .disabled(!model.canEditPlan)
@@ -47,6 +49,18 @@ struct MenuBarMenu: View {
     }
     private var status: String {
         !model.engine.phase.isRunning ? "Paused" : model.engine.phase.isBreak ? "On a break" : "Focusing"
+    }
+    @ViewBuilder private var updateItem: some View {
+        switch model.updater.state {
+        case .available(let release):
+            Button("Update to Mellow \(release.version)…") { model.checkForUpdates() }
+        case .checking:
+            Button("Checking for Updates…") {}.disabled(true)
+        case .downloading, .installing:
+            Button("Installing Update…") {}.disabled(true)
+        default:
+            Button("Check for Updates…") { model.checkForUpdates() }
+        }
     }
     private var visibilityButton: some View {
         Button(model.panelVisible ? "Hide Panel" : "Show Panel") { model.togglePanel() }

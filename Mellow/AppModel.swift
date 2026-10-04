@@ -8,6 +8,9 @@ final class AppModel: NSObject {
     var settings: Settings
     let engine: SessionEngine
     let music: MusicPlayer
+    let updater = Updater()
+    /// Set when Mellow quits to relaunch into an update; the running session was already confirmed.
+    @ObservationIgnored var relaunching = false
     var compact = false
     /// First-run setup is showing in the panel.
     var onboarding = false
@@ -47,6 +50,9 @@ final class AppModel: NSObject {
             announce(isBreak ? "Break over" : "Session complete. \(settings.companion.completionTitle)")
         }
         observeRunning()
+        updater.isBusy = { [weak self] in self?.engine.phase.isActive ?? false }
+        updater.willRelaunch = { [weak self] in self?.relaunching = true }
+        updater.start()
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(woke), name: NSWorkspace.didWakeNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(dayChanged), name: .NSCalendarDayChanged, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(displaysChanged), name: NSApplication.didChangeScreenParametersNotification, object: nil)
@@ -185,6 +191,11 @@ final class AppModel: NSObject {
         case .light: NSAppearance(named: .aqua)
         case .dark: NSAppearance(named: .darkAqua)
         }
+    }
+    func checkForUpdates() {
+        settingsOpen = false
+        if let release = updater.available { updater.offer(release) }
+        else { Task { await updater.check(userInitiated: true) } }
     }
     func playChime() { NSSound(named: "Glass")?.play() }
     func announce(_ text: String) {
