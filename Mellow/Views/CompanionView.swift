@@ -3,7 +3,7 @@ import SwiftUI
 /// The mascot in the panel (46 pt), the compact capsule (36 pt) and the Settings tiles.
 ///
 /// Every companion is a pair of five-frame sprites from the asset catalog:
-/// `<type>-loop-01…05` loops at 5 fps while a focus session runs, and
+/// `<type>-loop-01…05` loops at 4 fps while a focus session runs, and
 /// `<type>-wake-01…05` (optional) plays once when the session completes, then holds its last frame.
 /// Ready shows loop frame 1; a paused session holds frame 1; a break holds the final pose.
 /// On top of the sprites, MascotMotion adds breathing, idle actions, reactions and small effects.
@@ -22,7 +22,8 @@ struct CompanionView: View {
     @State private var poke: Date?
     @State private var hovering = false
 
-    private static let fps = 5.0
+    /// Sprite frames per second (slowed from 5 so the loop reads calmer).
+    private static let fps = 4.0
     private var sprite: SpriteFrames { SpriteFrames.for(type) }
     private var finished: Bool { phase == .complete || phase.isBreak }
     /// Motion and effects run only where they can be seen.

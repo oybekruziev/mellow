@@ -23,6 +23,8 @@ enum MascotMood: Equatable {
 }
 
 enum MascotMotion {
+    /// One knob for the pace of every motion and effect (1 = the original speed).
+    static let tempo = 0.75
     enum Action: CaseIterable { case hop, wiggle, stretch, tilt, flicker, float }
 
     /// The idle actions each mascot can pick from.
@@ -49,7 +51,7 @@ enum MascotMotion {
 
     static func pose(_ type: CompanionType, mood: MascotMood, events: MascotEvents, at date: Date, size: CGFloat) -> MascotPose {
         var pose = MascotPose()
-        let t = date.timeIntervalSinceReferenceDate
+        let t = date.timeIntervalSinceReferenceDate * tempo
         let s = Double(seed(type))
 
         // Breathing: slower and deeper while asleep.
@@ -95,7 +97,7 @@ enum MascotMotion {
     }
 
     private static func react(_ action: Action, since start: Date, at date: Date, duration: Double, size: CGFloat, _ pose: inout MascotPose) {
-        let p = date.timeIntervalSince(start) / duration
+        let p = date.timeIntervalSince(start) * tempo / duration
         if p >= 0 && p < 1 { apply(action, p, size, &pose) }
     }
 
@@ -144,7 +146,7 @@ enum MascotMotion {
     /// Drawn behind the sprite (candle glow).
     static func drawBack(_ context: inout GraphicsContext, canvas: CGSize, type: CompanionType, mood: MascotMood, at date: Date, size: CGFloat) {
         guard type == .candle, mood == .working || mood == .resting else { return }
-        let t = date.timeIntervalSinceReferenceDate
+        let t = date.timeIntervalSinceReferenceDate * tempo
         let pulse = 0.55 + 0.25 * sin(2 * .pi * t / 1.7) + 0.08 * sin(2 * .pi * t * 3.1)
         let center = CGPoint(x: canvas.width / 2, y: canvas.height / 2 - size * 0.22)
         let radius = size * 0.42
@@ -156,7 +158,7 @@ enum MascotMotion {
     /// Drawn over the sprite (z's, steam, stars, petals).
     static func drawFront(_ context: inout GraphicsContext, canvas: CGSize, type: CompanionType, mood: MascotMood,
                           events: MascotEvents, at date: Date, size: CGFloat) {
-        let t = date.timeIntervalSinceReferenceDate
+        let t = date.timeIntervalSinceReferenceDate * tempo
         let mid = CGPoint(x: canvas.width / 2, y: canvas.height / 2)
 
         if mood == .sleeping {
@@ -213,7 +215,7 @@ enum MascotMotion {
 
         if let done = events.completed {
             // A burst of petals when the session is complete.
-            let elapsed = date.timeIntervalSince(done)
+            let elapsed = date.timeIntervalSince(done) * tempo
             let duration = 1.8
             if elapsed >= 0 && elapsed < duration {
                 let p = elapsed / duration

@@ -147,3 +147,15 @@ Two review passes, one on window/engine/concurrency and one on SwiftUI/UX/access
 - **Install:** download → mount → check the bundle ID and version → `codesign --verify --deep --strict -R` with the team `79CTV95T7T` requirement → `spctl --assess` → copy next to the running app → swap with `replaceItemAt` → relaunch once the old process exits. If the folder is not writable, the disk image opens in Finder instead.
 - **End-to-end test:** an ad-hoc Debug build posing as 0.9, run from a scratch folder against the real GitHub feed, found v1.0. It downloaded the release DMG, verified it, replaced itself and relaunched. Afterwards the bundle was Notarized Developer ID, with no leftover staging files or mounted images. Debug-only hooks: `MELLOW_UPDATE_FEED`, `MELLOW_UPDATE_CURRENT`, `MELLOW_UPDATE_AUTOINSTALL`.
 - 16 tests pass and the stress run is clean.
+
+## Livelier mascots (2026-10-04, version 1.2)
+
+- **Motion:** `MascotMotion` adds breathing, sway and an idle action every ~10 s on top of the sprites (hop, wiggle, stretch, tilt, plus flicker for the candle and float for the moon). It also handles:
+  - **pause:** the mascot sleeps, slumps and z's rise;
+  - **start/resume:** a wake-up hop;
+  - **the panel mascot:** it grows on hover and hops and wiggles on click;
+  - **completion:** a hop and a petal burst.
+- **Effects:** steam (coffee), twinkling stars (moon), a warm glow (candle) and growth sparkles (plant, cactus).
+- **Speed:** after the user's review, everything was slowed by 25% (`tempo = 0.75`) and the sprite loop by 5 → 4 fps.
+- **Rendering:** one `TimelineView` drives it all, at 24 fps while a timer runs and 12 fps otherwise. It stops when the panel is hidden, in Reduce Motion, and in Settings previews.
+- **Checks:** filmstrip snapshot `19-motion.png`. The stress run is clean.

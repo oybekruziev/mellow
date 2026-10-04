@@ -16,7 +16,7 @@ macOS 26+ uchun native SwiftUI fokus taymeri. Figma dizayni va `Mellow-handoff/I
 - **Ko‘p vazifali reja:** **Plan several tasks…** havolasi, vazifa ustiga bosish, menyudagi **Plan Tasks…** yoki **⌘P** muharririni ochadi. Unda vazifalar soni (20 tagacha), hammasi uchun bitta vaqt, break uzunligi, har bir vazifaning nomi va vaqti beriladi. Nom yozilmasa “Task N” bo‘ladi; oxirgi qatorda Return yangi vazifa qo‘shadi.
 - **Vazifa vaqti tugaganda:** “Start break” rejimida break o‘zi boshlanadi, keyingi vazifa **Next Task** bilan. “Let me choose” rejimida **+5 min**, **Break** yoki **Next** tanlanadi. Fokus paytida **✓** vazifani muddatidan oldin bajarilgan deb belgilaydi.
 - **Lofi musiqa:** pastdagi ♪ tugmasi. Settings’da “Play lofi music during focus” yoqilsa, musiqa fokus bilan birga yonadi va o‘chadi. 13 ta CC0 trek (HoliznaCC0).
-- **Maskotlar:** Plant, Cat, Candle, Fox, Coffee, Moon, Cactus. Fokus paytida 5 kadr sekundiga 5 marta aylanadi, sessiya tugaganda “uyg‘onish” yoki “gullash” animatsiyasi o‘ynaydi.
+- **Maskotlar:** Plant, Cat, Candle, Fox, Coffee, Moon, Cactus. Fokus paytida 5 kadr sekundiga 4 marta aylanadi, sessiya tugaganda “uyg‘onish” yoki “gullash” animatsiyasi o‘ynaydi. Ustiga kod bilan jonlilik qo‘shilgan (`MascotMotion.swift`): nafas olish, chayqalish, har ~10 soniyada sakrash/silkinish/cho‘zilish/bosh egish, pauzada uxlash va “z z z”, davom ettirganda uyg‘onib sakrash, sichqoncha ustiga borganda kattalashish, bosilganda sakrash, sessiya tugaganda gul barglari; qahvada bug‘, oy atrofida yulduzchalar, sham nuri. Tezlik bitta `tempo` qiymati bilan boshqariladi; Reduce Motion yoqilsa va panel yashirilganda hammasi to‘xtaydi.
 
 ## Xcode
 
