@@ -6,6 +6,7 @@ import SwiftUI
 /// `<type>-loop-01…05` loops at 5 fps while a focus session runs, and
 /// `<type>-wake-01…05` (optional) plays once when the session completes, then holds its last frame.
 /// Ready shows loop frame 1; a paused session holds frame 1; a break holds the final pose.
+/// On top of the sprites, MascotMotion adds breathing, idle actions, reactions and small effects.
 struct CompanionView: View {
     let type: CompanionType
     let phase: SessionPhase
@@ -13,32 +14,70 @@ struct CompanionView: View {
     var completedAt: Date? = nil
     var size: CGFloat = 46
     var preview = false
+    /// The panel's mascot reacts to the pointer and to clicks.
+    var interactive = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.panelAnimating) private var animating
+    @State private var wake: Date?
+    @State private var poke: Date?
+    @State private var hovering = false
 
     private static let fps = 5.0
     private var sprite: SpriteFrames { SpriteFrames.for(type) }
     private var finished: Bool { phase == .complete || phase.isBreak }
+    /// Motion and effects run only where they can be seen.
+    private var alive: Bool { !preview && !reduceMotion && animating }
+    private var mood: MascotMood {
+        switch phase {
+        case .focusing(true), .confirmEnd(true): .working
+        case .focusing(false), .confirmEnd(false), .onBreak(false): .sleeping
+        case .onBreak(true), .complete, .breakOver: .resting
+        case .ready: .idle
+        }
+    }
 
     var body: some View {
         Group {
-            if !preview, !reduceMotion, animating, phase.isRunning, !finished {
-                // Redraw only at the sprite's frame rate.
-                TimelineView(.periodic(from: .now, by: 1 / Self.fps)) { context in art(frame(at: context.date)) }
-            } else if !preview, !reduceMotion, animating, finished, let completedAt,
-                      Date.now.timeIntervalSince(completedAt) < Double(sprite.finale.count) / Self.fps {
-                // The finale: one redraw per frame, then it stops on the last pose.
-                TimelineView(.explicit((0...sprite.finale.count).map { completedAt.addingTimeInterval(Double($0) / Self.fps) })) { context in
-                    art(frame(at: context.date))
+            if alive {
+                // Smooth while a timer runs, calmer otherwise.
+                TimelineView(.animation(minimumInterval: phase.isRunning ? 1 / 24 : 1 / 12)) { context in
+                    stage(at: context.date)
                 }
             } else {
                 art(frame(at: .now))
             }
         }
         .frame(width: size, height: size)
+        .scaleEffect(interactive && hovering && alive ? 1.07 : 1, anchor: .bottom)
+        .animation(.spring(duration: 0.35, bounce: 0.45), value: hovering)
+        .onHover { if interactive { hovering = $0 } }
+        .simultaneousGesture(TapGesture().onEnded { poke = .now }, including: interactive && alive ? .all : .subviews)
+        .onChange(of: phase.isRunning) { _, running in if running { wake = .now } }
         .animation(.easeOut(duration: 0.25), value: type)
         .accessibilityLabel(type.title)
         .help(tooltip)
+    }
+
+    private func stage(at date: Date) -> some View {
+        let events = MascotEvents(wake: wake, poke: poke, completed: finished ? completedAt : nil)
+        let pose = MascotMotion.pose(type, mood: mood, events: events, at: date, size: size)
+        let mood = mood
+        return art(frame(at: date))
+            .scaleEffect(x: pose.scaleX, y: pose.scaleY, anchor: .bottom)
+            .rotationEffect(.degrees(pose.angle), anchor: .bottom)
+            .offset(x: pose.dx, y: pose.dy)
+            .background {
+                Canvas { context, canvas in
+                    MascotMotion.drawBack(&context, canvas: canvas, type: type, mood: mood, at: date, size: size)
+                }
+                .frame(width: size * 2, height: size * 2).allowsHitTesting(false)
+            }
+            .overlay {
+                Canvas { context, canvas in
+                    MascotMotion.drawFront(&context, canvas: canvas, type: type, mood: mood, events: events, at: date, size: size)
+                }
+                .frame(width: size * 2, height: size * 2).allowsHitTesting(false)
+            }
     }
 
     private func frame(at date: Date) -> String {

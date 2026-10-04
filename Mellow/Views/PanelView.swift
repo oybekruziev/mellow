@@ -165,7 +165,8 @@ struct PanelView: View {
                         Image("mellow-logo").resizable().scaledToFit().frame(width: 40, height: 40)
                             .accessibilityLabel("Mellow")
                     } else {
-                        CompanionView(type: model.settings.companion, phase: phase, progress: engine.progress, completedAt: engine.completedAt)
+                        CompanionView(type: model.settings.companion, phase: phase, progress: engine.progress, completedAt: engine.completedAt,
+                                      interactive: true)
                     }
                 }
                 .contextMenu { CompanionMenu(model: model) }
