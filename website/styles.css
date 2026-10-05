@@ -6,8 +6,8 @@
   --band: #f6ede5;
   --ink: #1c1c1e;
   --ink-2: #3a3a3c;
-  --secondary: #6e6e73;
-  --tertiary: #8e8e93;
+  --secondary: #616166;
+  --tertiary: #6b6b70;
   --body: #5a5a60;
   --green: #1f8a3f;
   --green-bright: #30d158;
@@ -443,7 +443,7 @@ button.btn-glass:hover { background: rgba(255, 255, 255, .92); }
 .steps { position: absolute; inset: 40px 24px 0 36px; display: flex; gap: 20px; }
 .step { position: relative; width: 270px; flex: none; }
 .step-copy { display: flex; flex-direction: column; gap: 10px; }
-.step-num { font-family: var(--hand); font-weight: 700; font-size: 34px; line-height: 43px; color: #b59c88; transition: color .3s var(--ease); }
+.step-num { font-family: var(--hand); font-weight: 700; font-size: 34px; line-height: 43px; color: #8f735f; transition: color .3s var(--ease); }
 .step h3 { font-size: 18px; font-weight: 590; line-height: 24px; }
 .step p { font-size: 15px; line-height: 21px; color: var(--secondary); width: 250px; }
 .step-panel { position: absolute; left: 0; top: 170px; width: 270px; transition: transform .4s var(--ease); }
