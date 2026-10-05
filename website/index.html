@@ -117,6 +117,10 @@
 
   <div class="stage" data-stage>
     <div class="stage-bg" aria-hidden="true"></div>
+    <div class="menubar" aria-hidden="true">
+      <span class="mb-left"><b>Mellow</b><span>Edit</span><span>View</span><span>Window</span></span>
+      <span class="mb-right"><span class="mb-item" data-mb-item><i class="ic ic-mellow"></i><span data-mb-time hidden>25:00</span></span><span data-mb-clock></span></span>
+    </div>
 
     <div class="panel-wrap" data-panel-wrap>
       <div class="panel demo-panel" data-demo-panel data-view="ready" role="group" aria-label="Mellow demo panel">
@@ -243,14 +247,7 @@
       </div>
     </div>
 
-    <button class="mascot mascot-cat" type="button" data-mascot="cat" aria-label="Make the cat your companion"><img src="assets/companions/cat-done.webp" alt="" width="128" height="128"></button>
-    <button class="mascot mascot-moon" type="button" data-mascot="moon" aria-label="Make the moon your companion"><img src="assets/companions/moon-1.webp" alt="" width="96" height="96"></button>
-    <button class="mascot mascot-fox" type="button" data-mascot="fox" aria-label="Make the fox your companion"><img src="assets/companions/fox-done.webp" alt="" width="124" height="124"></button>
-
-    <div class="hero-note" data-hero-note aria-hidden="true">
-      <span class="hand hero-note-text">type a task — it really runs</span>
-      <svg class="hero-note-arrow" width="84" height="64" viewBox="-2 -2 84 64" fill="none"><path d="M 0 60 C 30 50 60 30 80 0 M 80 0 L 64 6 M 80 0 L 80 18" stroke="#E8588A" stroke-width="2.5" stroke-linecap="round"/></svg>
-    </div>
+    <p class="stage-hint">This panel is live. Type a task and press <kbd>Return ↵</kbd></p>
   </div>
   <p class="sr-only" aria-live="polite" data-live></p>
 </section>
@@ -359,18 +356,18 @@
 <section class="crew band dim-able" id="companions" aria-labelledby="crew-title">
   <h2 class="sec-title" id="crew-title">Meet the <em class="accent">crew.</em></h2>
   <p class="sec-sub crew-sub">Seven small companions. Hover one to wake it up, click to bring it into the panel up top.</p>
-  <div class="cards" role="radiogroup" aria-label="Choose a companion" data-cards>
-    <div class="cards-row">
-      <div class="card" role="radio" tabindex="-1" aria-checked="false" data-type="plant" style="--card:#e7f0e1"><span class="sprite" aria-hidden="true"></span><span class="card-name">Plant</span><span class="card-quote">“I grow a little every quarter.”</span><span class="chip" aria-hidden="true">Hover to wake</span></div>
-      <div class="card" role="radio" tabindex="-1" aria-checked="false" data-type="cat" style="--card:#f8e8da"><span class="sprite" aria-hidden="true"></span><span class="card-name">Cat</span><span class="card-quote">“I’ll nap. You work. Deal?”</span><span class="chip" aria-hidden="true">Hover to wake</span></div>
-      <div class="card" role="radio" tabindex="-1" aria-checked="false" data-type="candle" style="--card:#faf0da"><span class="sprite" aria-hidden="true"></span><span class="card-name">Candle</span><span class="card-quote">“I burn quietly till you’re done.”</span><span class="chip" aria-hidden="true">Hover to wake</span></div>
-      <div class="card" role="radio" tabindex="-1" aria-checked="false" data-type="fox" style="--card:#f8e0d2"><span class="sprite" aria-hidden="true"></span><span class="card-name">Fox</span><span class="card-quote">“Curled up. One ear on you.”</span><span class="chip" aria-hidden="true">Hover to wake</span></div>
-    </div>
-    <div class="cards-row">
-      <div class="card" role="radio" tabindex="-1" aria-checked="false" data-type="coffee" data-nowake style="--card:#f0e5db"><span class="sprite" aria-hidden="true"></span><span class="card-name">Coffee</span><span class="card-quote">“Still warm when you’re back.”</span><span class="chip" aria-hidden="true">Hover to wake</span></div>
-      <div class="card" role="radio" tabindex="-1" aria-checked="false" data-type="moon" data-nowake style="--card:#e8e6f5"><span class="sprite" aria-hidden="true"></span><span class="card-name">Moon</span><span class="card-quote">“Drifting by until the bell.”</span><span class="chip" aria-hidden="true">Hover to wake</span></div>
-      <div class="card" role="radio" tabindex="-1" aria-checked="false" data-type="cactus" style="--card:#e4efe0"><span class="sprite" aria-hidden="true"></span><span class="card-name">Cactus</span><span class="card-quote">“Prickly outside. Blooms for you.”</span><span class="chip" aria-hidden="true">Hover to wake</span></div>
-    </div>
+  <div class="crew-quote" aria-hidden="true">
+    <p class="cq-text" data-cq-text>“I’ll nap. You work. Deal?”</p>
+    <p class="cq-who"><span data-cq-name>Cat</span> · <span data-cq-state>keeping you company</span></p>
+  </div>
+  <div class="shelf" role="radiogroup" aria-label="Choose a companion" data-cards>
+    <div class="pal" role="radio" tabindex="-1" aria-checked="false" data-type="plant" data-quote="“I grow a little every quarter.”"><span class="pal-stage"><span class="sprite" aria-hidden="true"></span></span><span class="pal-name">Plant</span></div>
+    <div class="pal" role="radio" tabindex="-1" aria-checked="false" data-type="cat" data-quote="“I’ll nap. You work. Deal?”"><span class="pal-stage"><span class="sprite" aria-hidden="true"></span></span><span class="pal-name">Cat</span></div>
+    <div class="pal" role="radio" tabindex="-1" aria-checked="false" data-type="candle" data-quote="“I burn quietly till you’re done.”"><span class="pal-stage"><span class="sprite" aria-hidden="true"></span></span><span class="pal-name">Candle</span></div>
+    <div class="pal" role="radio" tabindex="-1" aria-checked="false" data-type="fox" data-quote="“Curled up. One ear on you.”"><span class="pal-stage"><span class="sprite" aria-hidden="true"></span></span><span class="pal-name">Fox</span></div>
+    <div class="pal" role="radio" tabindex="-1" aria-checked="false" data-type="coffee" data-quote="“Still warm when you’re back.”" data-nowake><span class="pal-stage"><span class="sprite" aria-hidden="true"></span></span><span class="pal-name">Coffee</span></div>
+    <div class="pal" role="radio" tabindex="-1" aria-checked="false" data-type="moon" data-quote="“Drifting by until the bell.”" data-nowake><span class="pal-stage"><span class="sprite" aria-hidden="true"></span></span><span class="pal-name">Moon</span></div>
+    <div class="pal" role="radio" tabindex="-1" aria-checked="false" data-type="cactus" data-quote="“Prickly outside. Blooms for you.”"><span class="pal-stage"><span class="sprite" aria-hidden="true"></span></span><span class="pal-name">Cactus</span></div>
   </div>
   <p class="hand crew-note" aria-hidden="true">the panel’s mascot changes too ↑</p>
 </section>

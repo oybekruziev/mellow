@@ -144,7 +144,9 @@ const focusStatus = $('[data-focus-status]');
 const focusProgress = $('[data-focus-progress]');
 const completeTask = $('[data-complete-task]');
 const pauseBtn = $('[data-action="pause"]', panel);
-const heroNote = $('[data-hero-note]');
+const mbTime = $('[data-mb-time]');
+const mbItem = $('[data-mb-item]');
+const mbClock = $('[data-mb-clock]');
 const stage = $('[data-stage]');
 
 let durationMin = 25;
@@ -236,6 +238,9 @@ function renderHero() {
   // Nav chip: the menu-bar timer while a session is on.
   navChip.hidden = !running;
   chipTime.textContent = fmt(demoRemaining);
+  mbTime.hidden = !running;
+  mbTime.textContent = fmt(demoRemaining);
+  mbItem.classList.toggle('is-on', running);
 
   // Compact capsule mirrors the panel.
   $('[data-cap-time]').textContent = running ? fmt(demoRemaining) : demo === 'done' ? 'Done' : `${String(durationMin).padStart(2, '0')}:00`;
@@ -281,7 +286,6 @@ function start() {
   set({ demo: 'running', demoRemaining: durationMin * 60 });
   showView('focus');
   document.body.classList.add('focus-mode');
-  noteGone();
   lastFrame = performance.now();
   clearInterval(rafId);
   rafId = setInterval(tick, 100);
@@ -335,7 +339,7 @@ function openConfirm() {
 }
 
 taskForm.addEventListener('submit', (e) => { e.preventDefault(); start(); });
-taskInput.addEventListener('focus', () => { if (store.demo === 'idle') set({ demo: 'typing' }); noteGone(); });
+taskInput.addEventListener('focus', () => { if (store.demo === 'idle') set({ demo: 'typing' }); });
 taskInput.addEventListener('blur', () => { if (store.demo === 'typing') set({ demo: 'idle' }); });
 
 const seg = $('[data-seg]');
@@ -378,44 +382,20 @@ const actions = {
 $('.panel-wrap').addEventListener('click', (e) => {
   const btn = e.target.closest('[data-action]');
   if (!btn) return;
-  noteGone();
   actions[btn.dataset.action]?.();
 });
 
-function noteGone() { heroNote.classList.add('is-gone'); }
-stage.addEventListener('pointerdown', noteGone, { once: true });
-
-// Floating mascots: click to pick, follow the cursor a little.
-$$('[data-mascot]').forEach((m) => {
-  m.addEventListener('click', () => {
-    set({ companion: m.dataset.mascot });
-    m.classList.remove('is-picked');
-    m.offsetWidth;
-    m.classList.add('is-picked');
-    toast(`${m.dataset.mascot[0].toUpperCase()}${m.dataset.mascot.slice(1)} will keep you company`);
-    noteGone();
-  });
-});
 let heroVisible = true;
 if ('IntersectionObserver' in window) {
   new IntersectionObserver(([e]) => { heroVisible = e.isIntersecting; }).observe(stage);
 }
 pauseOffscreen($('#try'));
-let mascotRaf = 0;
-addEventListener('pointermove', (e) => {
-  if (!finePointer.matches || reduceMotion.matches || !heroVisible || mascotRaf) return;
-  mascotRaf = requestAnimationFrame(() => {
-    mascotRaf = 0;
-    const r = stage.getBoundingClientRect();
-    const dx = (e.clientX - (r.left + r.width / 2)) / innerWidth;
-    const dy = (e.clientY - (r.top + r.height / 2)) / innerHeight;
-    $$('[data-mascot]', stage).forEach((m, i) => {
-      const k = [1, 0.7, 0.85][i];
-      m.style.setProperty('--mx', `${clamp(dx * 24 * k, -12, 12)}px`);
-      m.style.setProperty('--my', `${clamp(dy * 24 * k, -12, 12)}px`);
-    });
-  });
-}, { passive: true });
+// The desktop's menu bar clock, like the real one.
+const dayFmt = new Intl.DateTimeFormat('en-US', { weekday: 'short' });
+const hourFmt = new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' });
+const tickClock = () => { const d = new Date(); mbClock.textContent = `${dayFmt.format(d)} ${hourFmt.format(d)}`; };
+tickClock();
+setInterval(tickClock, 30000);
 
 subscribe((s, patch) => {
   renderHero();
@@ -485,24 +465,32 @@ stepsEl.addEventListener('scroll', () => {
 // ---------- Meet the crew ----------
 
 const cardsEl = $('[data-cards]');
-const cards = $$('.card', cardsEl);
+const cards = $$('.pal', cardsEl);
+const cqText = $('[data-cq-text]');
+const cqName = $('[data-cq-name]');
+const cqState = $('[data-cq-state]');
+const nameOf = (card) => $('.pal-name', card).textContent;
+
+// One quote above the shelf follows whichever companion you point at, else the picked one.
+function showQuote(card) {
+  const picked = card.getAttribute('aria-checked') === 'true';
+  cqText.textContent = card.dataset.quote;
+  cqName.textContent = nameOf(card);
+  cqState.textContent = picked ? 'keeping you company' : touchOnly.matches ? 'tap to pick' : 'click to pick';
+}
+const pickedCard = () => cards.find((c) => c.getAttribute('aria-checked') === 'true') || cards[1];
+
 cards.forEach((card) => {
   const t = card.dataset.type;
   card.style.setProperty('--still', `url(${companionSrc(t, 1)})`);
   card.style.setProperty('--done', `url(${companionSrc(t, 'done')})`);
   card.style.setProperty('--loop', `url(assets/sprites/${t}-loop.webp)`);
   if (!card.hasAttribute('data-nowake')) card.style.setProperty('--wake', `url(assets/sprites/${t}-wake.webp)`);
-  card.setAttribute('aria-label', `${$('.card-name', card).textContent}: ${$('.card-quote', card).textContent}`);
-  const chip = $('.chip', card);
-  const chipText = () => {
-    chip.textContent = card.getAttribute('aria-checked') === 'true' ? '✓ Keeping you company'
-      : touchOnly.matches ? 'Tap to pick'
-      : card.classList.contains('is-hover') || card.matches(':hover') ? 'Click to pick' : 'Hover to wake';
-  };
-  card.addEventListener('pointerenter', () => { card.classList.add('is-hover'); chipText(); });
-  card.addEventListener('pointerleave', () => { card.classList.remove('is-hover'); chipText(); });
-  card.addEventListener('focus', () => { if (card.matches(':focus-visible')) card.classList.add('is-hover'); chipText(); });
-  card.addEventListener('blur', () => { card.classList.remove('is-hover'); chipText(); });
+  card.setAttribute('aria-label', `${nameOf(card)}: ${card.dataset.quote}`);
+  card.addEventListener('pointerenter', () => { card.classList.add('is-hover'); showQuote(card); });
+  card.addEventListener('pointerleave', () => { card.classList.remove('is-hover'); showQuote(pickedCard()); });
+  card.addEventListener('focus', () => { if (card.matches(':focus-visible')) card.classList.add('is-hover'); showQuote(card); });
+  card.addEventListener('blur', () => { card.classList.remove('is-hover'); showQuote(pickedCard()); });
   card.addEventListener('click', () => pickCard(card));
   card.addEventListener('keydown', (e) => {
     const i = cards.indexOf(card);
@@ -514,7 +502,6 @@ cards.forEach((card) => {
     cards.forEach((c) => { c.tabIndex = c === next ? 0 : -1; });
     next.focus();
   });
-  card._chipText = chipText;
 });
 function pickCard(card) {
   const wasSelected = card.getAttribute('aria-checked') === 'true';
@@ -530,8 +517,9 @@ subscribe((s, patch) => {
     const on = c.dataset.type === s.companion;
     c.setAttribute('aria-checked', String(on));
     if (on && !cardsEl.contains(document.activeElement)) cards.forEach((x) => { x.tabIndex = x === c ? 0 : -1; });
-    c._chipText();
   });
+  const hovered = cards.find((c) => c.classList.contains('is-hover'));
+  showQuote(hovered || pickedCard());
 });
 pauseOffscreen($('#companions'));
 
