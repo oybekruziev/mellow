@@ -89,7 +89,7 @@ const chipTime = $('[data-chip-time]');
 navChip.addEventListener('click', () => scrollToEl($('#try')));
 
 // Version line from latest.json (scripts/publish.sh writes it). The links work without it.
-fetch('https://download.bemellow.cc/latest.json', { cache: 'no-cache' })
+fetch('/download/latest.json', { cache: 'no-cache' })
   .then((res) => (res.ok ? res.json() : Promise.reject(res.status)))
   .then(({ version }) => {
     if (!version) return;
