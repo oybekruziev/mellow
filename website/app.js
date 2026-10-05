@@ -1000,8 +1000,6 @@ const garden = (() => {
   const NAMES = [['Mon', 'Monday', 3], ['Tue', 'Tuesday', 5], ['Wed', 'Wednesday', 2], ['Thu', 'Thursday', 4], ['Fri', 'Friday', 6], ['Sat', 'Saturday', 1], ['Sun', 'Today', 0]];
   const W = 1000;
   const centerX = (i) => 71 + i * 142.9;
-  const flowerTop = (k) => 250 - k * 36;
-  const flowerLeft = (k) => (k % 2 ? 12.5 : -7.5) - 20; // relative to the column centre
   let revealed = false;
   let pending = 0;
   const dur = (n) => { const m = n * 25; return m >= 60 ? `${Math.floor(m / 60)}h${m % 60 ? ` ${m % 60}m` : ''}` : `${m}m`; };
@@ -1023,8 +1021,7 @@ const garden = (() => {
       const slot = document.createElement('span');
       slot.className = 'slot';
       slot.dataset.slot = '';
-      slot.style.left = '40px';
-      slot.style.top = `${flowerTop(n) - 2}px`;
+      slot.style.setProperty('--i', n);
       stack.append(slot);
     }
     li.append(stack);
@@ -1034,9 +1031,9 @@ const garden = (() => {
   function flower(k, i) {
     const f = document.createElement('span');
     f.className = 'flower';
-    f.style.left = `${60 + flowerLeft(k)}px`;
-    f.style.top = `${flowerTop(k)}px`;
-    f.style.rotate = `${k % 2 ? -8 : 8}deg`;
+    // Position comes from CSS (--i, odd/even) so the stack scales with the layout.
+    f.className = `flower ${k % 2 ? 'odd' : 'even'}`;
+    f.style.setProperty('--i', k);
     f.style.setProperty('--delay', `${(i * 6 + k) * 40}ms`);
     return f;
   }
@@ -1052,8 +1049,10 @@ const garden = (() => {
     const n = i === 6 ? store.todayFlowers : NAMES[i][2];
     $('strong', tip).textContent = i === 6 ? 'Today' : long;
     $('span', tip).textContent = `${n} session${n === 1 ? '' : 's'} · ${n ? dur(n) : '0m'}`;
-    const top = flowerTop(Math.max(n - 1, 0)) - 60 - (i === 6 ? 36 : 0);
-    tip.style.left = li.style.left;
+    const stack = $('.day-stack', li).lastElementChild;
+    const top = stack ? stack.offsetTop - tip.offsetHeight - 12 : 0;
+    const half = tip.offsetWidth / 2 + 6;
+    tip.style.left = `${clamp(li.offsetLeft + li.offsetWidth / 2, half, el.clientWidth - half)}px`;
     tip.style.top = `${Math.max(top, -10)}px`;
     tip.classList.remove('is-hidden');
   }
@@ -1071,7 +1070,7 @@ const garden = (() => {
       f.classList.add('pop');
       stack.insertBefore(f, slot);
     }
-    slot.style.top = `${flowerTop(store.todayFlowers) - 2}px`;
+    slot.style.setProperty('--i', store.todayFlowers);
     li.setAttribute('aria-label', `Today: ${store.todayFlowers} session${store.todayFlowers === 1 ? '' : 's'}, ${dur(store.todayFlowers)}`);
     moveTip(6);
   }
