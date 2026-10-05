@@ -1,9 +1,14 @@
-// Deploys the landing page to bemellow.cc as a Cloudflare Worker with static assets.
+// Deploys the landing page as a Cloudflare Worker with static assets.
 //   cd website && npx wrangler deploy
+// worker.js serves the DMG and latest.json from R2 under /download/, so
+// downloads work on every domain below (and on workers.dev).
 {
   "name": "mellow-website",
   "compatibility_date": "2026-10-01",
-  "assets": { "directory": "." },
+  "main": "worker.js",
+  "assets": { "directory": ".", "binding": "ASSETS" },
+  "r2_buckets": [{ "binding": "DOWNLOADS", "bucket_name": "mellow-downloads" }],
+  "workers_dev": true,
   "routes": [
     { "pattern": "bemellow.cc", "custom_domain": true },
     { "pattern": "www.bemellow.cc", "custom_domain": true }
