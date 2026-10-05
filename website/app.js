@@ -247,7 +247,7 @@ function renderCounts() {
   const base = 3 + store.todayFlowers;
   $$('[data-panel-flowers]').forEach((el) => {
     const isNew = el.hasAttribute('data-new');
-    const n = Math.min(isNew ? base : base, 6);
+    const n = Math.min(base, 6);
     el.innerHTML = Array.from({ length: n }, (_, i) => `<i${isNew && i === n - 1 ? ' class="new"' : ''}></i>`).join('');
   });
   $$('[data-panel-count]').forEach((el) => {
@@ -367,9 +367,9 @@ const actions = {
   keep: () => setConfirm(false),
   'confirm-end': stopToReady,
   later: stopToReady,
-  break: () => { stopToReady(); toast('In the app, a 5-minute break starts here.'); },
+  break: () => { stopToReady(); toast('Break time. In the app a 5-minute timer starts.'); },
   compact: () => setCompact(!compact),
-  hide: () => toast('In the app, this tucks Mellow into the menu bar.'),
+  hide: () => toast('In the app this hides the panel to the menu bar.'),
   settings: () => toast('Settings live in the app'),
   plans: () => scrollToEl($('#plans')),
   music: () => music.toggle(),
@@ -391,7 +391,7 @@ $$('[data-mascot]').forEach((m) => {
     m.classList.remove('is-picked');
     m.offsetWidth;
     m.classList.add('is-picked');
-    toast(`${m.dataset.mascot[0].toUpperCase()}${m.dataset.mascot.slice(1)} is keeping you company`);
+    toast(`${m.dataset.mascot[0].toUpperCase()}${m.dataset.mascot.slice(1)} will keep you company`);
     noteGone();
   });
 });
@@ -586,6 +586,7 @@ const timeline = (() => {
       const min = Number(el.dataset.min);
       el.style.left = `${cursor * ppm + 2}px`;
       el.style.width = `${Math.max(min * ppm - 4, 8)}px`;
+      el.classList.toggle('is-narrow', min * ppm < 150);
       cursor += min;
     });
     placeNow();
@@ -614,7 +615,7 @@ const timeline = (() => {
         br.className = 'tl-block tl-break';
         br.dataset.min = BREAK;
         br.setAttribute('aria-label', '5-minute break');
-        br.innerHTML = '<i class="ic ic-cup" aria-hidden="true"></i><span class="tl-break-label" aria-hidden="true">+5 · Break · Next</span>';
+        br.innerHTML = '<i class="ic ic-cup" aria-hidden="true"></i><span class="tl-break-label" aria-hidden="true"><b>+5</b>Break<br>Next</span>';
         if (t.id === newId) br.classList.add('is-new');
         list.append(br);
       }
@@ -648,8 +649,6 @@ const timeline = (() => {
   }
 
   function showTip(el, from, to) {
-    let end = 0;
-    for (const t of tasks) { end += t.min; if (`${t.id}` === el.dataset.id) break; end += BREAK; }
     tip.textContent = `${from} → ${to} min · done by ${timeFmt.format(at(totalMin()))}`;
     tip.hidden = false;
     tip.style.left = `${el.offsetLeft + el.offsetWidth}px`;
@@ -697,7 +696,6 @@ const timeline = (() => {
     if (e.target.closest('.tl-remove')) {
       tasks = tasks.filter((t) => t !== task);
       render();
-      count.focus?.();
       toast(`Removed “${task.name}”`);
       return;
     }
@@ -755,7 +753,7 @@ const timeline = (() => {
     e.preventDefault();
     const name = addInput.value.trim();
     if (!name) return;
-    if (tasks.length >= MAX) { toast('Twenty tasks is the limit'); return; }
+    if (tasks.length >= MAX) { toast('A plan holds up to 20 tasks'); return; }
     const t = { id: ++uid, name: name.slice(0, 40), min: 25 };
     tasks.push(t);
     addInput.value = '';
@@ -854,7 +852,7 @@ const music = (() => {
     ui(true);
     note.classList.add('is-gone');
     clearTimeout(fadeTimer);
-    audio.play().catch(() => { set({ musicPlaying: false }); ui(false); toast('The browser blocked audio — press play once more'); });
+    audio.play().catch(() => { set({ musicPlaying: false }); ui(false); toast('Your browser blocked the audio. Press play again.'); });
     const ac = ctx();
     if (fadeGain && ac) {
       fadeGain.gain.cancelScheduledValues(ac.currentTime);
@@ -911,7 +909,6 @@ pauseOffscreen($('#music'));
   const demo = $('[data-end-demo]');
   const panelEl = $('[data-end-panel]');
   const time = $('[data-end-time]');
-  const timeDim = $('[data-end-time-dim]');
   const square = $('[data-end-square]');
   const pauseB = $('[data-end-pause]');
   const restart = $('[data-end-restart]');
@@ -939,7 +936,6 @@ pauseOffscreen($('#music'));
   };
   const render = () => {
     time.textContent = fmt(remaining);
-    timeDim.textContent = fmt(remaining);
     progress.style.width = `${clamp(0.25 + (1478 - remaining) / 1500, 0, 1) * 100}%`;
   };
 
@@ -963,8 +959,7 @@ pauseOffscreen($('#music'));
   $('[data-end-keep]').addEventListener('click', () => {
     if (state === 'ready') { remaining = 1500; companion.src = companionSrc('plant', 3); }
     setState('running');
-    toast('Back to it.');
-  });
+      });
   $('[data-end-confirm]').addEventListener('click', () => {
     pulse.classList.add('is-done');
     hint.classList.add('is-gone');
@@ -1151,7 +1146,7 @@ const garden = (() => {
     space: toggle,
     p: () => timeline.focusAdd(),
     m: () => { setCompact(!compact); if (!heroVisible) scrollToEl($('#try')); },
-    '.': () => { if (store.demo === 'running' || store.demo === 'paused') { openConfirm(); if (!heroVisible) scrollToEl($('#try')); } else toast('Start the demo first — then ⌘. asks to end it'); },
+    '.': () => { if (store.demo === 'running' || store.demo === 'paused') { openConfirm(); if (!heroVisible) scrollToEl($('#try')); } else toast(`Start the demo first, then ${isMac ? '⌘' : 'Ctrl'}. asks to end it`); },
     ',': () => toast('Settings live in the app'),
   };
 
