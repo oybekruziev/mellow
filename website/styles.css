@@ -159,6 +159,7 @@ body.focus-mode .nav { background: rgba(246, 237, 229, .82); }
 .sec-title .accent { font-size: 66px; line-height: 62px; letter-spacing: -.01em; }
 .sec-sub {
   width: 600px;
+  text-wrap: pretty;
   max-width: 100%;
   margin: 16px auto 0;
   font-size: 20px;
@@ -231,7 +232,7 @@ body.focus-mode .dim-able { opacity: .55; }
 }
 .panel-wrap { position: absolute; left: calc(55px / 1.45); top: calc(113px / 1.45); width: 300px; zoom: 1.45; }
 .mascot { position: absolute; padding: 0; border-radius: 50%; z-index: 3; transform-origin: 0 0; transform: translate(var(--mx, 0), var(--my, 0)); transition: transform .4s var(--ease); }
-.mascot img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 12px 18px rgba(77, 38, 26, .18)); animation: bob 4s ease-in-out infinite; animation-delay: var(--bob, 0s); transition: transform .3s var(--ease); }
+.mascot img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 8px 8px rgba(77, 38, 26, .14)); animation: bob 4s ease-in-out infinite; animation-delay: var(--bob, 0s); transition: transform .3s var(--ease); }
 .mascot:hover img { transform: scale(1.06); }
 .mascot-cat { left: -52px; top: -40px; width: 128px; height: 128px; rotate: 8deg; }
 .mascot-moon { left: 440px; top: -28px; width: 96px; height: 96px; rotate: -10deg; --bob: -1.3s; }
@@ -497,10 +498,11 @@ button.btn-glass:hover { background: rgba(255, 255, 255, .92); }
   height: 170px;
   flex: none;
   background: var(--still) center / contain no-repeat;
-  transition: width .2s var(--ease), height .2s var(--ease);
+  transform-origin: 50% 100%;
+  transition: transform .2s var(--ease);
 }
 .card-name { font-family: var(--rounded); font-weight: 600; font-size: 24px; line-height: 29px; }
-.card-quote { width: 222px; font-family: var(--serif); font-style: italic; font-size: 21px; line-height: 26px; color: #6b5a4e; text-align: center; }
+.card-quote { width: 222px; text-wrap: balance; font-family: var(--serif); font-style: italic; font-size: 21px; line-height: 26px; color: #6b5a4e; text-align: center; }
 .chip {
   margin-top: auto;
   padding: 6px 12px;
@@ -514,10 +516,10 @@ button.btn-glass:hover { background: rgba(255, 255, 255, .92); }
   transition: background-color .2s var(--ease), color .2s var(--ease);
 }
 .card:hover, .card.is-hover { transform: translateY(-6px); box-shadow: 0 24px 40px -12px rgba(115, 64, 26, .16); }
-.card:hover .sprite, .card.is-hover .sprite, .card.is-waking .sprite { width: 184px; height: 184px; background: var(--loop) 0 0 / 500% 100% no-repeat; animation: sprite 1s steps(5, jump-none) infinite; }
+.card:hover .sprite, .card.is-hover .sprite, .card.is-waking .sprite { transform: scale(1.0824); background: var(--loop) 0 0 / 500% 100% no-repeat; animation: sprite 1s steps(5, jump-none) infinite; }
 .card.is-waking .sprite { background-image: var(--wake); animation: sprite 1s steps(5, jump-none) 1 forwards; }
 .card[aria-checked="true"] { box-shadow: inset 0 0 0 2px var(--green), 0 24px 40px -12px rgba(115, 64, 26, .16); }
-.card[aria-checked="true"]:not(.is-waking) .sprite { width: 184px; height: 184px; background: var(--done) center / contain no-repeat; animation: none; }
+.card[aria-checked="true"]:not(.is-waking) .sprite { transform: scale(1.0824); background: var(--done) center / contain no-repeat; animation: none; }
 .card[data-nowake][aria-checked="true"]:not(.is-waking) .sprite { background: var(--loop) 0 0 / 500% 100% no-repeat; animation: sprite 2s steps(5, jump-none) infinite; }
 .card[aria-checked="true"] .chip { background: var(--green); color: #fff; }
 @keyframes sprite { to { background-position: 100% 0; } }
@@ -1052,7 +1054,7 @@ button.btn-glass:hover { background: rgba(255, 255, 255, .92); }
   .crew { padding: 96px 16px 112px; }
   .cards { gap: 12px; margin-top: 40px; }
   .card { flex: 0 0 calc(50% - 6px); max-width: none; height: auto; min-height: 268px; gap: 4px; padding: 16px 10px 16px; border-radius: 24px; }
-  .card .sprite, .card:hover .sprite, .card.is-hover .sprite, .card.is-waking .sprite, .card[aria-checked="true"]:not(.is-waking) .sprite { width: 112px; height: 112px; }
+  .sprite { width: 112px; height: 112px; }
   .card-name { font-size: 19px; line-height: 23px; }
   .card-quote { font-size: 16px; line-height: 20px; }
   .chip { margin-top: auto; padding: 5px 10px; font-size: 11px; line-height: 14px; }
