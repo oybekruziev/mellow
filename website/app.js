@@ -7,6 +7,7 @@ const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
 const finePointer = matchMedia('(pointer: fine)');
+const touchOnly = matchMedia('(hover: none)');
 const isMac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
 
 // ---------- Store ----------
@@ -495,6 +496,7 @@ cards.forEach((card) => {
   const chip = $('.chip', card);
   const chipText = () => {
     chip.textContent = card.getAttribute('aria-checked') === 'true' ? '✓ Keeping you company'
+      : touchOnly.matches ? 'Tap to pick'
       : card.classList.contains('is-hover') || card.matches(':hover') ? 'Click to pick' : 'Hover to wake';
   };
   card.addEventListener('pointerenter', () => { card.classList.add('is-hover'); chipText(); });
@@ -1041,6 +1043,8 @@ const garden = (() => {
     days.innerHTML = '';
     NAMES.forEach((_, i) => days.append(col(i)));
     moveTip(3);
+    // On small screens the resting tooltip covers the next day; show it on tap instead.
+    if (matchMedia('(max-width: 767px)').matches) tip.classList.add('is-hidden');
   }
   function moveTip(i) {
     const li = days.children[i];
@@ -1058,7 +1062,7 @@ const garden = (() => {
   }
   days.addEventListener('pointerover', (e) => { const li = e.target.closest('.day'); if (li) moveTip(Number(li.dataset.index)); });
   days.addEventListener('focusin', (e) => { const li = e.target.closest('.day'); if (li) moveTip(Number(li.dataset.index)); });
-  el.addEventListener('pointerleave', () => moveTip(3));
+  el.addEventListener('pointerleave', () => { if (!touchOnly.matches) moveTip(3); });
 
   function popToday(count) {
     const li = days.children[6];
