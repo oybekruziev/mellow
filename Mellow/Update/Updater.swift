@@ -1,13 +1,15 @@
 import AppKit
 import Observation
+import UserNotifications
 
 /// Checks GitHub Releases for a newer Mellow and installs it in place.
 ///
 /// - The newest release comes from `api.github.com/repos/<repo>/releases/latest`;
 ///   its tag (`v1.1`) is the version and its `.dmg` asset is the update.
-/// - Mellow checks a few seconds after launch and then once a day. When an update is found it
-///   says so (unless the user skipped that version, or a session is running — then only the
-///   menu shows it). "Check for Updates…" always asks right away.
+/// - Mellow checks a few seconds after launch and then every few hours. A new version arrives as
+///   a notification (Install / Later), once per version, unless the user skipped it; the menu
+///   shows it too. Without notification permission it falls back to the alert, but never during
+///   a session. "Check for Updates…" always asks right away.
 /// - Before anything is replaced, the downloaded app must carry Oybek Ruziev's Developer ID
 ///   signature and pass Gatekeeper. If Mellow can't replace itself (a read-only location),
 ///   it opens the disk image so the user can drag the new version over.
@@ -31,10 +33,12 @@ final class Updater {
     static let repository = "oybekruziev/mellow"
     /// The Developer ID team every update must be signed by.
     static let teamID = "79CTV95T7T"
-    private static let checkInterval: TimeInterval = 24 * 60 * 60
+    private static let checkInterval: TimeInterval = 6 * 60 * 60
+    private static let notificationCategory = "mellow.update"
 
     @ObservationIgnored private let defaults: UserDefaults
     @ObservationIgnored private var timer: Timer?
+    @ObservationIgnored private let notifications = UpdateNotificationDelegate()
     /// True while a session runs: an automatic check then only marks the menu.
     @ObservationIgnored var isBusy: () -> Bool = { false }
     /// Called right before Mellow quits to relaunch into the new version.
@@ -60,6 +64,7 @@ final class Updater {
     // MARK: Checking
 
     func start() {
+        setUpNotifications()
         #if DEBUG
         // Test hook: with a fake feed, check right away instead of once a day.
         if ProcessInfo.processInfo.environment["MELLOW_UPDATE_FEED"] != nil {
@@ -102,7 +107,7 @@ final class Updater {
             if ProcessInfo.processInfo.environment["MELLOW_UPDATE_AUTOINSTALL"] != nil { await install(release); return }
             #endif
             let skipped = defaults.string(forKey: "updateSkippedVersion") == release.version
-            if userInitiated || (!skipped && !isBusy()) { offer(release) }
+            if userInitiated { offer(release) } else if !skipped { await announce(release) }
         } catch {
             state = .idle
             if userInitiated { showError("Couldn't check for updates", error) }
@@ -187,6 +192,62 @@ final class Updater {
         alert.messageText = title
         alert.informativeText = (error as? UpdateError)?.message ?? error.localizedDescription
         alert.runModal()
+    }
+
+    // MARK: Notifying
+
+    private func setUpNotifications() {
+        let center = UNUserNotificationCenter.current()
+        let install = UNNotificationAction(identifier: "install", title: "Install and Relaunch")
+        let later = UNNotificationAction(identifier: "later", title: "Later")
+        center.setNotificationCategories([UNNotificationCategory(identifier: Self.notificationCategory,
+                                                                 actions: [install, later], intentIdentifiers: [])])
+        notifications.handle = { [weak self] action in
+            guard let self, action != "later", action != UNNotificationDismissActionIdentifier else { return }
+            // Mellow may have relaunched since the banner was posted: look the release up again.
+            guard let release = self.available else { Task { await self.check(userInitiated: true) }; return }
+            if action == "install" && !self.isBusy() { Task { await self.install(release) } }
+            else { self.offer(release) } // the banner itself, or Install during a session (the alert warns first)
+        }
+        center.delegate = notifications
+    }
+
+    /// Tells the user about a new version: a notification once per version, or the alert when
+    /// notifications are off (never in the middle of a session).
+    private func announce(_ release: Release) async {
+        guard defaults.string(forKey: "updateNotifiedVersion") != release.version else { return }
+        let center = UNUserNotificationCenter.current()
+        var status = await center.notificationSettings().authorizationStatus
+        if status == .notDetermined {
+            _ = try? await center.requestAuthorization(options: [.alert, .sound])
+            status = await center.notificationSettings().authorizationStatus
+        }
+        guard status == .authorized || status == .provisional else {
+            if !isBusy() { offer(release) }
+            return
+        }
+        let content = UNMutableNotificationContent()
+        content.title = "Mellow \(release.version) is available"
+        content.body = Self.summary(of: release.notes) ?? "Click to see what's new."
+        content.sound = .default
+        content.categoryIdentifier = Self.notificationCategory
+        let request = UNNotificationRequest(identifier: "update-\(release.version)", content: content, trigger: nil)
+        do {
+            try await center.add(request)
+            defaults.set(release.version, forKey: "updateNotifiedVersion")
+        } catch {
+            if !isBusy() { offer(release) }
+        }
+    }
+
+    /// The first bullet or sentence of the notes, short enough for a banner.
+    static func summary(of notes: String) -> String? {
+        let line = notes.components(separatedBy: .newlines)
+            .map { $0.trimmingCharacters(in: .whitespaces) }
+            .first { !$0.isEmpty && !$0.lowercased().hasPrefix("what's") }
+        guard var text = line?.replacingOccurrences(of: "• ", with: "") else { return nil }
+        if text.count > 140 { text = String(text.prefix(139)) + "…" }
+        return text
     }
 
     // MARK: Installing
@@ -309,5 +370,18 @@ private struct GitHubRelease: Decodable {
     let assets: [Asset]
     enum CodingKeys: String, CodingKey {
         case tagName = "tag_name", body, draft, prerelease, htmlURL = "html_url", assets
+    }
+}
+
+/// Receives clicks on the update notification and shows banners even while Mellow is frontmost.
+final class UpdateNotificationDelegate: NSObject, UNUserNotificationCenterDelegate, @unchecked Sendable {
+    @MainActor var handle: (String) -> Void = { _ in }
+
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification) async
+        -> UNNotificationPresentationOptions { [.banner, .sound] }
+
+    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {
+        let action = response.actionIdentifier
+        await MainActor.run { handle(action) }
     }
 }

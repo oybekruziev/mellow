@@ -16,7 +16,9 @@ enum Palette {
     // Liquid Glass takes its tone from whatever is behind it, so on its own it turns light over a
     // white window and dark over a black one. The wash pins the glass to the app's appearance,
     // keeping the labels readable on any backdrop.
-    static let panelWash = Color(light: .white.withAlphaComponent(0.74), dark: .black.withAlphaComponent(0.68))
+    static func panelWash(_ scheme: ColorScheme) -> Color {
+        scheme == .dark ? Color(.sRGB, white: 0, opacity: 0.68) : Color(.sRGB, white: 1, opacity: 0.74)
+    }
     static let panelEdge = Color(light: .white.withAlphaComponent(0.65), dark: .white.withAlphaComponent(0.15))
     static let control = Color(light: .white.withAlphaComponent(0.75), dark: .white.withAlphaComponent(0.13))
     /// Outline of an off switch, so it reads on a white section too.
@@ -68,13 +70,18 @@ struct GlassSurface: ViewModifier {
 struct GlassBackground: View {
     var radius: CGFloat = 26
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+    @Environment(\.colorScheme) private var colorScheme
     var body: some View {
         let shape = RoundedRectangle(cornerRadius: radius, style: .continuous)
         ZStack {
             if reduceTransparency {
                 shape.fill(Color(nsColor: .windowBackgroundColor))
             } else {
-                shape.fill(Palette.panelWash).glassEffect(.regular, in: shape)
+                // The wash is resolved here, from the app's appearance, as a fixed color.
+                // Inside glassEffect a dynamic color follows the glass instead, and small glass
+                // (the compact capsule) turns dark over a dark backdrop: in Light mode that gave a
+                // dark capsule under dark labels.
+                shape.fill(Palette.panelWash(colorScheme)).glassEffect(.regular, in: shape)
             }
             shape.strokeBorder(Palette.panelEdge, lineWidth: 0.75)
         }
