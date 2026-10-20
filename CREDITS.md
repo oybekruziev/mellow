@@ -1,6 +1,6 @@
 # Credits
 
-Mellow is designed and built by **Oybek Ruziev**. © 2026 Oybek Ruziev. All rights reserved.
+Mellow is designed and built by **Oybek Ruziev**. The code is under the [MIT License](LICENSE); the name, logo, app icon and mascot artwork are © 2026 Oybek Ruziev, all rights reserved (see [TRADEMARKS.md](TRADEMARKS.md)).
 
 Mellow is free to download and use. Third-party material bundled in the app:
 
@@ -8,7 +8,7 @@ Mellow is free to download and use. Third-party material bundled in the app:
 |---|---|---|---|
 | Lofi music — 13 tracks from the album “Public Domain Lofi”: Birds, Calm Currents, Ode To Forgetting, One Night In France, Peaceful Drift, Saturation, Shimmer, Still Life, Theta Frequency, Tokyo Sunset, Tranquil Mindscape, Wetlands, When Time Called Me Darling | HoliznaCC0 | CC0 1.0 Universal (public domain) | https://freemusicarchive.org/music/holiznacc0/public-domain-lofi |
 | UI icons (sliders-horizontal, minimize-2, maximize-2, eye-off, play, pause, square, check, x, plus, minus, coffee, music, skip-forward, list-plus, globe) | Lucide contributors | ISC | https://lucide.dev |
-| Mascot artwork (plant, cat, candle, fox, coffee, moon, cactus) | Generated with ChatGPT for Mellow; sheets in `Mellow-handoff/Generated/` | Owned by the author under OpenAI's terms | — |
+| Mascot artwork (plant, cat, candle, fox, coffee, moon, cactus) | Generated with ChatGPT for Mellow; sheets in `Mellow-handoff/Generated/` | Owned by the author under OpenAI's terms; not covered by the MIT License (see TRADEMARKS.md) | — |
 
 CC0 does not require attribution; it is listed here as a courtesy and as a record of where each file came from (downloaded 2026-10-03). The app bundles 160 kbps AAC re-encodes; the original mp3 files are kept in `Mellow-handoff/Music-original/`.
 
