@@ -19,8 +19,11 @@ struct MenuBarMenu: View {
     @Bindable var model: AppModel
     var body: some View {
         if model.engine.phase.isActive {
-            Text("\(status) — \(model.engine.formattedTime) left")
-            Text(model.engine.task)
+            // No ticking time here: the menu bar label already shows it, and a title that
+            // changes every second makes SwiftUI rebuild the open menu, which leaves the
+            // hover highlight drawn between rows and the hovered title invisible.
+            Text(status)
+            if !model.engine.task.isEmpty { Text(model.engine.task) }
             Divider()
             visibilityButton
             Button(model.engine.phase.isRunning ? "Pause" : "Resume") {
