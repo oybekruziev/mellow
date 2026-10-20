@@ -1,74 +1,73 @@
 # Mellow
 
-macOS 26+ uchun native SwiftUI fokus taymeri. Figma dizayni va `Mellow-handoff/INSTRUCTIONS.md` asosida yaratildi. Hech qanday tashqi kutubxona yoki server kerak emas.
+A tiny focus timer that floats at the edge of your Mac. Name one task, start the clock, and
+watch a small companion grow.
 
-## Ochish
+[![Mellow: the floating focus panel and three companions](website/og-image.jpg)](https://bemellow.cc)
 
-`Build/Mellow.app` faylini ikki marta bosing. Mellow Dock’da ko‘rinmaydi: u menyu panelidagi gul belgisi va suzuvchi panel orqali ishlaydi.
+**[Download for Mac](https://bemellow.cc)** · [Releases](https://github.com/oybekruziev/mellow/releases) · Free, macOS 26 Tahoe or later
 
-- Birinchi ochilishda **onboarding** chiqadi: maskot, fokus va break vaqti, ovoz, lofi musiqa va mavzu tanlanadi. Settings → “Show Welcome Again” orqali qayta ochiladi.
-- Vazifani yozing va **Start Focus** bosing.
-- **15 / 25 / 45 min** yoki Settings’da **1–120 min** tanlang.
-- Tugallangan fokus bir gul beradi. Tanaffus gul bermaydi.
-- Settings yoki hamroh ustida o‘ng tugma orqali **Plant / Cat / Candle** almashtiriladi.
-- Panelni yashirish yoki ixcham qilish taymerni to‘xtatmaydi. Yashirilganda panel menyu panelidagi gul belgisiga "kirib ketadi".
-- **Reja (to-do):** vazifani yozib **+** bosing, har bir vazifaga o‘z vaqtini bering.
-- **Ko‘p vazifali reja:** **Plan several tasks…** havolasi, vazifa ustiga bosish, menyudagi **Plan Tasks…** yoki **⌘P** muharririni ochadi. Unda vazifalar soni (20 tagacha), hammasi uchun bitta vaqt, break uzunligi, har bir vazifaning nomi va vaqti beriladi. Nom yozilmasa “Task N” bo‘ladi; oxirgi qatorda Return yangi vazifa qo‘shadi.
-- **Vazifa vaqti tugaganda:** “Start break” rejimida break o‘zi boshlanadi, keyingi vazifa **Next Task** bilan. “Let me choose” rejimida **+5 min**, **Break** yoki **Next** tanlanadi. Fokus paytida **✓** vazifani muddatidan oldin bajarilgan deb belgilaydi.
-- **Lofi musiqa:** pastdagi ♪ tugmasi. Settings’da “Play lofi music during focus” yoqilsa, musiqa fokus bilan birga yonadi va o‘chadi. 13 ta CC0 trek (HoliznaCC0).
-- **Maskotlar:** Plant, Cat, Candle, Fox, Coffee, Moon, Cactus. Fokus paytida 5 kadr sekundiga 4 marta aylanadi, sessiya tugaganda “uyg‘onish” yoki “gullash” animatsiyasi o‘ynaydi. Ustiga kod bilan jonlilik qo‘shilgan (`MascotMotion.swift`): nafas olish, chayqalish, har ~10 soniyada sakrash/silkinish/cho‘zilish/bosh egish, pauzada uxlash va “z z z”, davom ettirganda uyg‘onib sakrash, sichqoncha ustiga borganda kattalashish, bosilganda sakrash, sessiya tugaganda gul barglari; qahvada bug‘, oy atrofida yulduzchalar, sham nuri. Tezlik bitta `tempo` qiymati bilan boshqariladi; Reduce Motion yoqilsa va panel yashirilganda hammasi to‘xtaydi.
+## What it does
 
-## Xcode
+- **One task at a time.** A small Liquid Glass panel holds a task and a timer (15, 25, 45, 60 or
+  any 1–120 minutes). Hide it or shrink it to a capsule; the time stays in the menu bar.
+- **Plans.** Line up to 20 tasks with their own lengths and breaks, and see when you will be done.
+- **Companions.** A plant, cat, candle, fox, coffee, moon or cactus grows a stage every quarter
+  of a session. Each finished session earns a flower for today.
+- **Lofi.** 13 public-domain tracks by HoliznaCC0 that can start and stop with your timer.
+- **Keyboard first.** Space starts or pauses, ⌘P plans, ⌘M shrinks, ⌘. ends, ⌘, opens Settings.
+- **Private.** No account and no analytics. The only network request is a check for a new
+  version on GitHub Releases every few hours.
+- **Accessible.** VoiceOver labels, keyboard focus, Reduce Motion and Reduce Transparency.
 
-`Mellow.xcodeproj` → **Mellow** scheme → Run. Xcode 26+ va macOS 26+ talab qilinadi.
+## Build from source
 
-Terminal orqali:
-
-```sh
-zsh scripts/build.sh
-open Build/Mellow.app
-zsh scripts/test.sh
-```
-
-Boshqa Mac'larga tarqatish uchun notarizatsiyalangan DMG:
+You need macOS 26 and Xcode 26. There are no third-party dependencies.
 
 ```sh
-zsh scripts/release.sh
+git clone https://github.com/oybekruziev/mellow.git
+cd mellow
+open Mellow.xcodeproj        # scheme "Mellow", then Run
 ```
 
-U Developer ID (Oybek Ruziev, 79CTV95T7T) bilan imzolaydi, Xcode'dagi Apple akkaunti orqali Apple'ga notarizatsiyaga yuboradi, tasdiqni ilovaga biriktiradi (staple) va `Build/Mellow-<version>.dmg` ni yaratadi. Notarizatsiyasiz mahalliy DMG: `zsh scripts/make_dmg.sh`.
-
-Yangi versiyani chiqarish: `MARKETING_VERSION` ni oshiring va `zsh scripts/release.sh --publish` ni ishga tushiring. U notarizatsiyalangan DMG yasaydi va uni darhol Cloudflare R2'ga (`download.bemellow.cc/Mellow.dmg`) yuklaydi — saytdagi Download tugmasi va versiya yozuvi o'zi yangilanadi. Buning uchun shu Mac'da wrangler Cloudflare'ga login qilingan bo'lishi kifoya (`npx wrangler login`); GitHub'da token kerak emas. Keyin GitHub'da shu DMG biriktirilgan release chiqaring:
+From the terminal:
 
 ```sh
-gh release create v1.1 Build/Mellow-1.1.dmg --title "Mellow 1.1" --generate-notes
+zsh scripts/build.sh         # Release build in Build/Mellow.app (ad-hoc signed)
+zsh scripts/test.sh          # core tests (swift test)
 ```
 
-**Ilova ichidagi yangilanish:** Mellow ishga tushgandan 5 soniya keyin va keyin kuniga bir marta GitHub'dagi eng oxirgi Release'ni tekshiradi (`releases/latest`; tag `v1.2` → versiya `1.2`, biriktirilgan `.dmg` → yangilanish). Yangi versiya topilsa, "Mellow 1.2 is available" oynasi chiqadi: **Install and Relaunch**, **Later**, **Release Notes** va "Skip this version". Sessiya ketayotgan bo'lsa, oyna chiqmaydi — faqat menyuda "Update to Mellow 1.2…" paydo bo'ladi. Menyudagi **Check for Updates…** va Settings'dagi **Check for Updates** darhol tekshiradi. O'rnatishdan oldin yuklangan ilova Developer ID (79CTV95T7T) imzosi va Gatekeeper'dan o'tishi shart. Ilova o'zini almashtira olmasa (masalan, yozib bo'lmaydigan papkada bo'lsa), DMG Finder'da ochiladi. Shuning uchun har bir Release'ga bitta notarizatsiyalangan `.dmg` biriktiring va tag'ni `v<MARKETING_VERSION>` qilib qo'ying. Draft va pre-release'lar e'tiborga olinmaydi.
-
-Brauzerda fayl `Mellow-<version>.dmg` nomi bilan saqlanadi. Tayyor DMG'ni alohida yuklash: `zsh scripts/publish.sh`. Zaxira yo'l: `.github/workflows/publish-dmg.yml` ni Actions'dan qo'lda ishga tushirish — buning uchun repo'da `CLOUDFLARE_API_TOKEN` secret'i (Workers R2 Storage: Edit) kerak.
-
-Sayt (`website/`) `bemellow.cc` da Cloudflare Worker sifatida turadi. O'zgarishdan keyin:
+A Debug build can render every panel state to PNG, handy when you change the UI:
 
 ```sh
-cd website && npx wrangler deploy
+MELLOW_SNAPSHOT_DIR=/tmp/mellow-snapshots path/to/Debug/Mellow.app/Contents/MacOS/Mellow
 ```
 
-## Qisqa tugmalar
+## Project layout
 
-Panel yoki app faol bo‘lganda: Space — boshlash/pauza/davom, Return — asosiy amal, Esc — tasdiqni bekor qilish yoki Settings’ni yopish; ⌘M — ixcham rejim, ⌘W — yashirish, ⌘, — Settings, ⌘. — tugatish, ⌘L — vazifa maydoni, ⌘Q — chiqish. Ready holatida 1/2/3 — vaqt presetlari.
+| Path | What is there |
+|---|---|
+| `Sources/MellowCore` | The timer engine, session states, plans, daily stats and settings. Pure Swift, fully tested. |
+| `Tests/MellowCoreTests` | Tests for every state and event, and the plan flow. |
+| `Mellow/Views` | SwiftUI panel, capsule, plan editor, settings, onboarding and the companions. |
+| `Mellow/Window` | The non-activating floating panel and where it sits on screen. |
+| `Mellow/MenuBar` | Menu bar label and menu. |
+| `Mellow/Music` | The lofi player. |
+| `Mellow/Update` | In-app updates from GitHub Releases, with signature checks. |
+| `Mellow/Debug` | Debug-only snapshot renderer and stress test. |
+| `website/` | The bemellow.cc landing page: plain HTML, CSS and JS on a Cloudflare Worker. |
 
-## Kod
+## Contributing
 
-- `Sources/MellowCore` — testlanadigan sana asosidagi taymer, holatlar, kunlik hisob va sozlamalar.
-- `Mellow/Window` — nonactivating NSPanel va ekran bo‘yicha joylashuv xotirasi.
-- `Mellow/Views` — Liquid Glass panel, Figma komponentlari (tugmalar, segment, switch, stepper), Settings va hamroh animatsiyalari.
-- `Mellow/Debug` — faqat Debug build: barcha holatlarni PNG qilib chiqaradi (`MELLOW_SNAPSHOT_DIR`).
-- `Mellow/MenuBar` — native menu bar label va menyu.
-- `Tests/MellowCoreTests` — 16 ta test; holat/event jadvalidagi barcha kombinatsiyalar va reja (to-do) oqimi tekshiriladi.
-- `Mellow/Resources/Assets.xcassets` — handoff’dagi asl assetlar va Light/Dark rang tokenlari.
+Bug reports, ideas and pull requests are welcome. Start with [CONTRIBUTING.md](CONTRIBUTING.md).
 
-- `Mellow/Music` — lofi pleyer, `Mellow/Resources/Music` — treklar.
-- `scripts/slice_sprites.swift` — ChatGPT sprite sheet’ini 512×512 kadrlarga kesadi (`Mellow-handoff/Generated/` → Assets).
+## License
 
-UI ingliz tilida, topshiriqqa muvofiq. Tekshiruv tafsilotlari: `VALIDATION.md`. Mualliflik: `OWNERSHIP.md`, `LICENSE`, `CREDITS.md`.
+The code is open source under the [MIT License](LICENSE).
+
+The **Mellow** name, the blossom logo, the app icon and the mascot artwork are not covered by
+it. You can fork and change Mellow freely, but a fork you distribute needs its own name, icon and
+mascots. See [TRADEMARKS.md](TRADEMARKS.md). Third-party music and icons keep their own licenses;
+see [CREDITS.md](CREDITS.md).
+
+Made by [Oybek Ruziev](https://aidancreates.space). O'zbekcha qo'llanma: [docs/uz/README.md](docs/uz/README.md).

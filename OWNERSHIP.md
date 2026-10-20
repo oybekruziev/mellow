@@ -12,8 +12,8 @@
 | Yaratilgan sana | 2026-yil oktabr (birinchi build: 2026-10-03) |
 | Bundle ID | `uz.oybek.Mellow` |
 | Dizayn manbasi | Figma fayli `iVm5j9tzNuOu4nreImQWAA` (muallif akkauntida) |
-| Tarqatish | Bepul (freeware) |
-| Huquqlar | © 2026 Oybek Ruziev. Barcha huquqlar himoyalangan. |
+| Tarqatish | Bepul; kod MIT, brend himoyada |
+| Huquqlar | Kod: MIT. Nom, logo, ikonka, maskotlar: © 2026 Oybek Ruziev, barcha huquqlar himoyalangan. |
 
 Muallifga tegishli qismlar: g'oya va mahsulot konsepsiyasi, Figma dizayni, foydalanuvchi interfeysi, manba kodi (`Mellow/`, `Sources/MellowCore/`, `Tests/`), copy (matnlar), maskotlarni tanlash va tahrirlash.
 
@@ -36,12 +36,13 @@ Eng kuchli dalil — **sanasi bor, o'zgartirib bo'lmaydigan, sizning nomingiz bi
 6. **Rasmiy ro'yxatdan o'tkazish (O'zbekiston).** O'zbekistonda kompyuter dasturlarini rasmiy ro'yxatdan o'tkazish xizmati bor. U Adliya vazirligi huzuridagi intellektual mulk idorasi (ima.uz) va my.gov.uz orqali ko'rsatiladi. Mualliflik huquqi ro'yxatsiz ham paydo bo'ladi, lekin guvohnoma nizo paytida kuchli hujjat bo'ladi. Talablar va to'lovlarni ima.uz saytidan tekshiring.
 7. **Nom (trademark).** "Mellow" so'zi keng tarqalgan, shu nomli boshqa ilova va brendlar bo'lishi mumkin. Oldin [WIPO Global Brand Database](https://branddb.wipo.int) va ima.uz bazasidan tekshiring. Nom band bo'lsa, o'ziga xosroq nom tanlang (masalan, "Mellow Focus") va nom bilan logoni tovar belgisi sifatida ro'yxatdan o'tkazishni ko'rib chiqing. Kodni boshqalar ko'chirsa ham, nom va logo sizniki bo'lib qoladi.
 
-## 3. Litsenziya tanlovi (bepul ilova uchun)
+## 3. Litsenziya (2026-10-20 dan)
 
-| Variant | Ma'nosi | Kimga mos |
-|---|---|---|
-| **Freeware, barcha huquqlar himoyalangan** (hozirgi `LICENSE`) | Hamma bepul ishlatadi, lekin kodni nusxalash, o'zgartirish, sotish mumkin emas | Mahsulot ustidan to'liq nazorat kerak bo'lsa (tavsiya) |
-| Open source (MIT) | Kodni hamma ko'chirib, o'zgartirib, hatto sotishi mumkin; faqat sizning ismingiz saqlanishi shart | Portfolio va hamjamiyat uchun; nomni trademark bilan himoyalash shart |
+Mellow open source: **kod MIT litsenziyasi** ostida (`LICENSE`). Hamma kodni ko'chirishi, o'zgartirishi va tarqatishi mumkin, faqat mualliflik va litsenziya matni saqlanishi shart.
+
+**Brend himoyada qoladi** (`TRADEMARKS.md`): "Mellow" nomi, gul logo, ilova ikonkasi va maskot rasmlari MIT ga kirmaydi. Fork tarqatadiganlar o'z nomi, ikonkasi va maskotlaridan foydalanishi kerak. Nomni qo'shimcha himoyalash uchun uni tovar belgisi sifatida ro'yxatdan o'tkazishni ko'rib chiqing (2-bo'lim, 7-band).
+
+Avvalgi versiyalar (1.0–1.2.2) "Freeware, barcha huquqlar himoyalangan" litsenziyasi bilan tarqatilgan.
 
 ## 4. Sun'iy intellekt bilan yaratilgan qismlar
 
