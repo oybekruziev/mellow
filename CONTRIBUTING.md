@@ -38,6 +38,21 @@ zsh scripts/test.sh
 ## Releases
 
 Releases are signed with the maintainer's Developer ID and notarized by Apple, so only the
-maintainer publishes them (`zsh scripts/release.sh --publish`, then a GitHub Release with the
-DMG attached). If you build Mellow yourself, `zsh scripts/build.sh` gives you an ad-hoc signed
-copy for your own Mac.
+maintainer publishes them. If you build Mellow yourself, `zsh scripts/build.sh` gives you an
+ad-hoc signed copy for your own Mac.
+
+For the maintainer:
+
+1. Raise `MARKETING_VERSION` (and `CURRENT_PROJECT_VERSION`) in `Mellow.xcodeproj`.
+2. `zsh scripts/release.sh --publish` archives, sends the app to Apple's notary service through
+   the Apple account signed in to Xcode, staples it, builds `Build/Mellow-<version>.dmg`, and
+   uploads it to the R2 bucket behind bemellow.cc's Download button (`latest.json` updates the
+   version line). It uses this Mac's `wrangler` login, so no Cloudflare token lives on GitHub.
+3. Publish a GitHub Release tagged `v<version>` with that DMG attached:
+   `gh release create v1.2.3 Build/Mellow-1.2.3.dmg --title "Mellow 1.2.3" --notes "…"`
+
+The in-app updater reads `releases/latest`: the tag is the version and the attached `.dmg` is
+the update. Drafts and pre-releases are ignored. Before installing, the downloaded app must
+carry the maintainer's Developer ID signature (team 79CTV95T7T) and pass Gatekeeper.
+
+The website lives in `website/` and deploys as a Cloudflare Worker: `cd website && npx wrangler deploy`.

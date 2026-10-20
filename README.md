@@ -20,6 +20,21 @@ watch a small companion grow.
   version on GitHub Releases every few hours.
 - **Accessible.** VoiceOver labels, keyboard focus, Reduce Motion and Reduce Transparency.
 
+## Keyboard shortcuts
+
+| Keys | Action |
+|---|---|
+| Space | Start, pause or resume |
+| Return | The panel's main action |
+| Esc | Cancel a confirmation or close Settings |
+| ⌘P | Plan tasks |
+| ⌘M | Compact capsule |
+| ⌘W | Hide the panel |
+| ⌘. | End the session |
+| ⌘L | Focus the task field |
+| ⌘, | Settings |
+| 1 / 2 / 3 | Focus length presets (when ready) |
+
 ## Build from source
 
 You need macOS 26 and Xcode 26. There are no third-party dependencies.
@@ -70,4 +85,4 @@ it. You can fork and change Mellow freely, but a fork you distribute needs its o
 mascots. See [TRADEMARKS.md](TRADEMARKS.md). Third-party music and icons keep their own licenses;
 see [CREDITS.md](CREDITS.md).
 
-Made by [Oybek Ruziev](https://aidancreates.space). O'zbekcha qo'llanma: [docs/uz/README.md](docs/uz/README.md).
+Made by [Oybek Ruziev](https://aidancreates.space).
