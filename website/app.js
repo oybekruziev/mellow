@@ -98,6 +98,22 @@ fetch('/download/latest.json', { cache: 'no-cache' })
   })
   .catch(() => {});
 
+// GitHub stars and watchers, cached by the Worker for ten minutes.
+fetch('/api/github')
+  .then((res) => (res.ok ? res.json() : Promise.reject(res.status)))
+  .then(({ stars, watchers }) => {
+    if (stars == null) return;
+    // Numbers from GitHub; shields.io may already send "1.2k".
+    const short = (n) => (typeof n === 'number' && n >= 1000 ? `${(n / 1000).toFixed(n >= 10000 ? 0 : 1).replace(/\.0$/, '')}k` : String(n));
+    const plural = (n, word) => `${short(n)} ${word}${n === 1 ? '' : 's'}`;
+    $('[data-gh-stars]').textContent = short(stars);
+    $('[data-gh-count]').hidden = false;
+    const gh = $('[data-gh]');
+    gh.setAttribute('aria-label', `Mellow on GitHub: ${plural(stars, 'star')}`);
+    if (watchers != null) gh.title = `${plural(stars, 'star')} · ${short(watchers)} watching`;
+  })
+  .catch(() => {});
+
 // ---------- Audio (lofi + chime share one context, created on a gesture) ----------
 
 let audioCtx;
