@@ -532,7 +532,6 @@ const timeline = (() => {
   const list = $('[data-tl-blocks]');
   const nowLine = $('[data-tl-now]');
   const tip = $('[data-tl-tip]');
-  const hint = $('[data-tl-hint]');
   const summary = $('[data-tl-summary]');
   const count = $('[data-tl-count]');
   const addForm = $('[data-tl-add]');
@@ -580,7 +579,6 @@ const timeline = (() => {
       cursor += min;
     });
     placeNow();
-    placeHint();
   }
 
   function placeNow() {
@@ -588,13 +586,6 @@ const timeline = (() => {
     const inside = mins >= 0 && mins <= totalMin();
     nowLine.hidden = !inside;
     if (inside) nowLine.style.left = `${mins * ppm}px`;
-  }
-
-  function placeHint() {
-    const el = list.querySelector(`[data-id="${activeId}"]`);
-    if (!el || hint.classList.contains('is-gone')) { hint.hidden = true; return; }
-    hint.hidden = false;
-    hint.style.left = `${el.offsetLeft + el.offsetWidth - 31}px`;
   }
 
   function render(newId) {
@@ -654,7 +645,6 @@ const timeline = (() => {
     activate(task.id);
     dragging = { task, el, x: e.clientX, min: task.min, scale: ppm };
     el.classList.add('is-dragging');
-    hint.classList.add('is-gone');
     showTip(el, task.min, task.min);
   });
   list.addEventListener('pointermove', (e) => {
@@ -727,7 +717,6 @@ const timeline = (() => {
       e.preventDefault();
       activate(task.id);
       resize(task, task.min + (e.key === 'ArrowRight' ? 5 : -5));
-      hint.classList.add('is-gone');
       announce(`${task.name}: ${task.min} minutes, done by ${timeFmt.format(at(totalMin()))}`);
     } else if (e.key === 'Enter') {
       e.preventDefault();
@@ -775,7 +764,6 @@ const music = (() => {
   const eq = $('[data-eq]');
   const bars = $$('i', eq);
   const volume = $('[data-volume]');
-  const note = $('.lofi-note');
   let audio, fadeGain, volGain, analyser, data, spin, eqRaf, fadeTimer;
   let angle = 0;
   eq.classList.add('is-idle');
@@ -840,7 +828,6 @@ const music = (() => {
     ensure();
     set({ musicPlaying: true });
     ui(true);
-    note.classList.add('is-gone');
     clearTimeout(fadeTimer);
     audio.play().catch(() => { set({ musicPlaying: false }); ui(false); toast('Your browser blocked the audio. Press play again.'); });
     const ac = ctx();
@@ -904,7 +891,6 @@ pauseOffscreen($('#music'));
   const restart = $('[data-end-restart]');
   const pulse = $('.pulse', square);
   const right = $('[data-end-right]');
-  const hint = $('.end-hint', demo);
   const statusText = $('[data-end-status-text]');
   const status = $('[data-end-status]');
   const companion = $('[data-end-companion]');
@@ -938,7 +924,6 @@ pauseOffscreen($('#music'));
 
   square.addEventListener('click', () => {
     pulse.classList.add('is-done');
-    hint.classList.add('is-gone');
     setState('confirm');
     right.classList.remove('is-replay');
     right.offsetWidth;
@@ -952,7 +937,6 @@ pauseOffscreen($('#music'));
       });
   $('[data-end-confirm]').addEventListener('click', () => {
     pulse.classList.add('is-done');
-    hint.classList.add('is-gone');
     remaining = 1500;
     companion.src = companionSrc('plant', 'done'); // the happy pose
     setState('ready');
@@ -1015,7 +999,7 @@ const garden = (() => {
       stack.append(slot);
     }
     li.append(stack);
-    li.insertAdjacentHTML('beforeend', `<span class="day-label">${short}</span>${isToday ? '<span class="hand today-hand" aria-hidden="true">today</span>' : ''}`);
+    li.insertAdjacentHTML('beforeend', `<span class="day-label">${short}</span>${isToday ? '<span class="today-tag" aria-hidden="true">today</span>' : ''}`);
     return li;
   }
   function flower(k, i) {
