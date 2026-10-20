@@ -431,9 +431,10 @@ function scrubStory() {
   setActiveStep(Math.min(3, Math.floor(p * 4)));
   rail.style.width = `${p * 100}%`;
   maskPath.style.strokeDashoffset = `${pathLen * (1 - p)}`;
-  // Between steps 2 and 3 the timer tweens 19:40 → 06:12 and the companion moves up a stage.
-  const t = clamp((p - 0.375) / 0.25, 0, 1);
-  storyTime.textContent = fmt(1180 + (372 - 1180) * t);
+  // Step 3 runs its own stretch of the session: 12:30 → 06:12 (half to three quarters) while
+  // the companion moves up a stage, so it never shows step 2's 19:40.
+  const t = clamp((p - 0.5) / 0.25, 0, 1);
+  storyTime.textContent = fmt(750 + (372 - 750) * t);
   storyProgress.style.width = `${(0.5 + 0.25 * t) * 100}%`;
   const src = companionSrc('plant', t < 0.5 ? 3 : 4);
   if (!storyCompanion.src.endsWith(src)) storyCompanion.src = src;
