@@ -919,6 +919,9 @@ button.btn-glass:hover { background: rgba(255, 255, 255, .92); }
 .socials a { width: 34px; height: 34px; border-radius: 17px; display: grid; place-items: center; background: rgba(0, 0, 0, .04); color: var(--ink); transition: background-color .2s var(--ease), color .2s var(--ease); }
 .socials a:hover { background: rgba(0, 0, 0, .08); color: var(--green); }
 .socials .ic { width: 16px; height: 16px; }
+.f-badge { display: block; margin: -16px 0; transition: opacity .2s var(--ease); }
+.f-badge img { display: block; height: 72px; width: auto; }
+.f-badge:hover { opacity: .75; }
 .f-links { display: flex; align-items: center; gap: 28px; font-size: 14px; line-height: 17px; color: var(--ink-2); }
 .f-links a:hover, .f-links button:hover { color: var(--green); }
 .f-links span { color: var(--tertiary); }
@@ -1089,6 +1092,7 @@ button.btn-glass:hover { background: rgba(255, 255, 255, .92); }
   .cta-title .accent { font-size: 48px; line-height: 46px; }
   .cta-body { font-size: 17px; }
   .footer { flex-direction: column; align-items: flex-start; padding: 32px 16px 40px; }
+  .f-badge { margin: -8px 0 -8px -8px; }
   .f-links { flex-wrap: wrap; gap: 12px 24px; }
   .credits { inset: auto 16px 16px 16px; width: auto; }
   .toast { white-space: normal; max-width: calc(100% - 32px); }
