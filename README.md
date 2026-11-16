@@ -70,7 +70,7 @@ MELLOW_SNAPSHOT_DIR=/tmp/mellow-snapshots path/to/Debug/Mellow.app/Contents/MacO
 | `Mellow/Music` | The lofi player. |
 | `Mellow/Update` | In-app updates from GitHub Releases, with signature checks. |
 | `Mellow/Debug` | Debug-only snapshot renderer and stress test. |
-| `website/` | The bemellow.cc landing page: plain HTML, CSS and JS on a Cloudflare Worker. |
+| `website/` | The bemellow.cc landing page: plain HTML, CSS and JS on a Cloudflare Worker. `stats.js` keeps cookie-free visit and download counts in D1 for the password-protected `/admin` page. |
 
 ## Contributing
 

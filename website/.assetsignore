@@ -1,3 +1,6 @@
 wrangler.jsonc
 .wrangler
 worker.js
+stats.js
+migrations
+.dev.vars
