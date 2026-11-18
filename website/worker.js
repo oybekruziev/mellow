@@ -1,7 +1,9 @@
-// Serves the static site, the DMG and latest.json from R2 under /download/, and GitHub
-// stats for the nav button under /api/github.
+// Serves the static site, the DMG and latest.json from R2 under /download/, GitHub
+// stats for the nav button under /api/github, and the visit/download counts at /admin.
 // Same-origin downloads keep working on every domain this Worker answers on,
 // including ones where download.bemellow.cc is unreachable.
+import { adminPage, recordDownload, recordVisit } from './stats.js';
+
 const FILES = {
   '/download/Mellow.dmg': 'Mellow.dmg',
   '/download/latest.json': 'latest.json',
@@ -53,8 +55,12 @@ export default {
   async fetch(request, env, ctx) {
     const { pathname } = new URL(request.url);
     if (pathname === '/api/github') return githubStats(ctx);
+    if (pathname === '/admin' || pathname === '/admin/') return adminPage(request, env);
     const key = FILES[pathname];
-    if (!key) return env.ASSETS.fetch(request);
+    if (!key) {
+      if (pathname === '/' || pathname === '/index.html') ctx.waitUntil(recordVisit(request, env).catch(() => {}));
+      return env.ASSETS.fetch(request);
+    }
     if (request.method !== 'GET' && request.method !== 'HEAD') {
       return new Response('Method not allowed', { status: 405, headers: { allow: 'GET, HEAD' } });
     }
@@ -63,6 +69,7 @@ export default {
       ? await env.DOWNLOADS.head(key)
       : await env.DOWNLOADS.get(key, { range: request.headers, onlyIf: request.headers });
     if (!object) return new Response('Not found', { status: 404 });
+    if (key === 'Mellow.dmg' && 'body' in object) ctx.waitUntil(recordDownload(request, env).catch(() => {}));
 
     const headers = new Headers();
     object.writeHttpMetadata(headers);
