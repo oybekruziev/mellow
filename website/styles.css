@@ -1156,3 +1156,46 @@ body { letter-spacing: .017em; }
   .gh-label { display: none; }
   .gh-count { padding-left: 0; border-left: 0; }
 }
+
+/* ---------- Pay what you want (fixed, Polar checkout) ---------- */
+
+.coffee {
+  position: fixed;
+  right: max(24px, env(safe-area-inset-right));
+  bottom: max(24px, env(safe-area-inset-bottom));
+  z-index: 90;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 18px 0 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .72);
+  -webkit-backdrop-filter: blur(20px) saturate(1.6);
+  backdrop-filter: blur(20px) saturate(1.6);
+  box-shadow: inset 0 0 0 .5px rgba(255, 255, 255, .8), 0 0 0 .5px rgba(0, 0, 0, .08), 0 10px 28px -10px rgba(60, 30, 20, .35);
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 590;
+  letter-spacing: .01em;
+  text-decoration: none;
+  animation: coffee-in .6s var(--spring) 1.2s both;
+  transition: transform .2s var(--ease), background-color .2s var(--ease), opacity 1.2s var(--ease);
+}
+.coffee .ic { width: 18px; height: 18px; color: var(--pink); transition: transform .3s var(--spring); }
+.coffee:hover { background: rgba(255, 255, 255, .92); transform: translateY(-2px); }
+.coffee:hover .ic { transform: rotate(-12deg); }
+.coffee:active { transform: translateY(0) scale(.97); }
+.coffee:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
+body.focus-mode .coffee { opacity: .55; }
+@keyframes coffee-in { from { opacity: 0; transform: translateY(16px) scale(.96); } }
+@media (prefers-reduced-motion: reduce) {
+  .coffee { animation: none; }
+  .coffee:hover, .coffee:hover .ic { transform: none; }
+}
+/* Keep the footer's last row clear of the button. */
+.footer { padding-bottom: 96px; }
+@media (max-width: 767px) {
+  .coffee { right: max(16px, env(safe-area-inset-right)); bottom: max(16px, env(safe-area-inset-bottom)); height: 40px; padding: 0 14px 0 12px; font-size: 14px; }
+  .footer { padding-bottom: 88px; }
+}
